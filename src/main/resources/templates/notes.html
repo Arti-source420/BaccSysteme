@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisie des Notes — BAC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Système BAC</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navPrincipal">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/notes">Saisie des Notes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/parametres">Règles de Délibération</a></li>
+                <li class="nav-item"><a class="nav-link" href="/calcul">Calcul Final</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <h2 style="margin-bottom:0"> Saisie des Notes</h2>
+        <a href="/" class="btn btn-secondary btn-sm">← Retour</a>
+    </div>
+
+    <!-- Notifications -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+         <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+         <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <!-- Formulaire d'enregistrement de note -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icone-section"></span>
+                    Enregistrer une note de copie
+                </div>
+                <div class="card-body">
+                    <form action="/notes/save" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Candidat</label>
+                            <select name="candidat.id" class="form-select" required>
+                                <option value="">— Sélectionner un candidat —</option>
+                                <option th:each="candidat : ${candidats}"
+                                        th:value="${candidat.id}"
+                                        th:text="${candidat.prenom + ' ' + candidat.nom}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Matière</label>
+                            <select name="matiere.id" class="form-select" required>
+                                <option value="">— Sélectionner une matière —</option>
+                                <option th:each="matiere : ${matieres}"
+                                        th:value="${matiere.id}"
+                                        th:text="${matiere.nom}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correcteur</label>
+                            <select name="correcteur.id" class="form-select" required>
+                                <option value="">— Sélectionner un correcteur —</option>
+                                <option th:each="correcteur : ${correcteurs}"
+                                        th:value="${correcteur.id}"
+                                        th:text="${correcteur.prenom + ' ' + correcteur.nom}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Note obtenue <small class="text-muted">(sur 20)</small></label>
+                            <input type="number" step="0.25" min="0" max="20" name="valeur"
+                                   class="form-control" placeholder="ex : 14.5" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                             Enregistrer la note
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registre des notes saisies -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icone-section"></span>
+                    Registre des notes saisies
+                    <span class="badge bg-secondary ms-auto" th:text="${#lists.size(notes) + ' entrées'}">0 entrées</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Candidat</th>
+                                    <th>Matière</th>
+                                    <th>Correcteur</th>
+                                    <th>Note</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="note : ${notes}">
+                                    <td th:text="${note.id}" style="opacity:0.5;font-size:0.82rem"></td>
+                                    <td th:text="${note.candidat.prenom + ' ' + note.candidat.nom}"></td>
+                                    <td th:text="${note.matiere.nom}"></td>
+                                    <td th:text="${note.correcteur.prenom + ' ' + note.correcteur.nom}"></td>
+                                    <td>
+                                        <span class="badge bg-primary" style="font-size:0.88rem;padding:0.4em 0.9em"
+                                              th:text="${note.valeur + '/20'}"></span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/notes/delete/{id}(id=${note.id})}"
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Supprimer cette note définitivement ?')">
+                                            🗑 Retirer
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(notes)}">
+                                    <td colspan="6" class="text-center py-4 text-muted" style="font-style:italic">
+                                        Aucune note enregistrée pour le moment
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

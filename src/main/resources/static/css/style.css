@@ -1,0 +1,884 @@
+/* ═══════════════════════════════════════════════════════════════════
+   SYSTÈME BAC — CSS GLOBAL (style Falcon / Admin Light)
+   ✅ Fond blanc, textes sombres, contraste garanti sur toutes les pages
+   ✅ Un seul fichier à modifier pour changer le thème partout
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── GOOGLE FONTS ────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap');
+
+/* ══════════════════════════════════════════════════════════════════
+   🎨 VARIABLES GLOBALES — MODIFIER ICI POUR CHANGER TOUT LE THÈME
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+    /* ─ Couleurs principales ─ */
+    --couleur-primaire:        #2c7be5;
+    --couleur-primaire-hover:  #1a68d1;
+    --couleur-primaire-clair:  #e8f0fc;
+    --couleur-secondaire:      #748194;
+
+    --couleur-succes:          #00d27a;
+    --couleur-succes-clair:    #e0f7ed;
+    --couleur-succes-texte:    #006644;
+
+    --couleur-danger:          #e63757;
+    --couleur-danger-clair:    #fce8ec;
+    --couleur-danger-texte:    #8b1a2e;
+
+    --couleur-avertissement:   #f5803e;
+    --couleur-avertissement-clair: #fef0e8;
+    --couleur-avertissement-texte: #8b3d0e;
+
+    --couleur-info:            #27bcfd;
+    --couleur-info-clair:      #e4f6ff;
+    --couleur-info-texte:      #0a5c7a;
+
+    --couleur-or:              #f5a623;
+    --couleur-or-clair:        #fef3e2;
+    --couleur-or-texte:        #7a4f00;
+
+    /* ─ Fond & surfaces ─ */
+    --fond-corps:              #f5f6fa;
+    --fond-carte:              #ffffff;
+    --fond-navbar:             #0b1727;
+    --fond-input:              #ffffff;
+    --fond-thead:              #f8f9fb;
+    --fond-row-hover:          #f0f4ff;
+
+    /* ─ Textes ─ */
+    --texte-principal:         #1e2e45;
+    --texte-secondaire:        #5a6a7a;
+    --texte-leger:             #9aacbe;
+    --texte-inverse:           #ffffff;
+    --texte-lien:              #2c7be5;
+
+    /* ─ Bordures ─ */
+    --bord-leger:              #e3e8ef;
+    --bord-moyen:              #c8d3df;
+    --bord-focus:              #2c7be5;
+
+    /* ─ Ombres ─ */
+    --ombre-carte:             0 2px 12px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.05);
+    --ombre-carte-hover:       0 8px 32px rgba(44, 123, 229, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --ombre-navbar:            0 2px 16px rgba(0, 0, 0, 0.20);
+    --ombre-btn:               0 4px 14px rgba(44, 123, 229, 0.35);
+
+    /* ─ Formes ─ */
+    --rayon:                   10px;
+    --rayon-petit:             6px;
+    --rayon-grand:             16px;
+    --rayon-pill:              50px;
+
+    /* ─ Transitions ─ */
+    --transition-vite:         0.16s ease;
+    --transition-normal:       0.26s ease;
+    --transition-lente:        0.40s ease;
+
+    /* ─ Typographie ─ */
+    --police-titre:            'Poppins', 'Segoe UI', sans-serif;
+    --police-corps:            'Nunito', 'Segoe UI', sans-serif;
+    --taille-base:             0.95rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BASE
+   ══════════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    background-color: var(--fond-corps);
+    color: var(--texte-principal);
+    font-family: var(--police-corps);
+    font-size: var(--taille-base);
+    font-weight: 400;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NAVBAR
+   ══════════════════════════════════════════════════════════════════ */
+.navbar {
+    background-color: var(--fond-navbar) !important;
+    box-shadow: var(--ombre-navbar);
+    padding: 0.7rem 0;
+    margin-bottom: 0;
+    animation: glisserBas 0.40s var(--transition-lente) both;
+}
+
+.navbar-brand {
+    font-family: var(--police-titre);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #ffffff !important;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: opacity var(--transition-vite);
+}
+
+.navbar-brand:hover {
+    opacity: 0.88;
+}
+
+.navbar-brand::before {
+    content: '🎓';
+    font-size: 1.2rem;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.45rem 1rem !important;
+    border-radius: var(--rayon-petit);
+    transition: all var(--transition-vite);
+    position: relative;
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 2px;
+    width: 0;
+    height: 2px;
+    background: var(--couleur-primaire);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: width var(--transition-normal);
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link.active::after {
+    width: 55%;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LAYOUT
+   ══════════════════════════════════════════════════════════════════ */
+.container {
+    padding-top: 2.2rem;
+    padding-bottom: 3rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TITRES — contraste fort sur fond blanc
+   ══════════════════════════════════════════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--police-titre);
+    color: var(--texte-principal);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.35rem; margin-bottom: 1.2rem; }
+h3 { font-size: 1.1rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: 0.95rem; font-family: var(--police-corps); font-weight: 700; }
+h6 { font-size: 0.875rem; font-family: var(--police-corps); font-weight: 600; }
+
+p {
+    color: var(--texte-secondaire);
+    margin-bottom: 0.75rem;
+}
+
+a {
+    color: var(--texte-lien);
+    text-decoration: none;
+    transition: color var(--transition-vite);
+}
+
+a:hover { color: var(--couleur-primaire-hover); }
+
+.text-muted {
+    color: var(--texte-secondaire) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CARTES — fond blanc, ombre légère, bordure subtile
+   ══════════════════════════════════════════════════════════════════ */
+.card {
+    background-color: var(--fond-carte);
+    border: 1px solid var(--bord-leger);
+    border-radius: var(--rayon);
+    box-shadow: var(--ombre-carte);
+    margin-bottom: 1.5rem;
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+    animation: monteeDouce 0.38s ease both;
+}
+
+.card:hover {
+    box-shadow: var(--ombre-carte-hover);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background-color: #fafbfc;
+    border-bottom: 1px solid var(--bord-leger);
+    border-radius: var(--rayon) var(--rayon) 0 0 !important;
+    padding: 0.9rem 1.25rem;
+    color: var(--texte-principal);
+    font-weight: 700;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-header .icone-section {
+    font-size: 1rem;
+}
+
+/* Accent bleu gauche sur le header */
+.card-header {
+    border-left: 3px solid var(--couleur-primaire);
+}
+
+.card-body {
+    padding: 1.4rem;
+    color: var(--texte-principal);
+}
+
+/* Variantes de cartes */
+.carte-resultat-final {
+    border-left: 4px solid var(--couleur-succes);
+}
+.carte-resultat-final .card-header {
+    background-color: var(--couleur-succes-clair);
+    border-left-color: var(--couleur-succes);
+    color: var(--couleur-succes-texte);
+}
+
+.carte-informative {
+    border-left: 4px solid var(--couleur-info);
+}
+.carte-informative .card-header {
+    background-color: var(--couleur-info-clair);
+    border-left-color: var(--couleur-info);
+    color: var(--couleur-info-texte);
+}
+
+/* Carte module accueil */
+.carte-module {
+    text-align: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.carte-module .card-body {
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.carte-module .icone-module {
+    font-size: 2.6rem;
+    margin-bottom: 0.9rem;
+    display: block;
+    transition: transform var(--transition-normal);
+}
+
+.carte-module:hover .icone-module {
+    transform: scale(1.15) rotate(-4deg);
+}
+
+.carte-module .titre-module {
+    font-family: var(--police-titre);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--texte-principal);
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.carte-module .description-module {
+    font-size: 0.85rem;
+    color: var(--texte-secondaire);
+    line-height: 1.55;
+    margin-bottom: 1.25rem;
+    display: block;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TABLEAUX — fond blanc, textes sombres, lisible garanti
+   ══════════════════════════════════════════════════════════════════ */
+.table {
+    color: var(--texte-principal);
+    background-color: transparent;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.table thead th {
+    background-color: var(--fond-thead);
+    color: var(--texte-secondaire);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 2px solid var(--bord-leger);
+    border-top: none;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid var(--bord-leger);
+    vertical-align: middle;
+    color: var(--texte-principal);
+    font-size: 0.9rem;
+    transition: background-color var(--transition-vite);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr:hover td {
+    background-color: var(--fond-row-hover);
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid var(--bord-leger);
+}
+
+.table-bordered tr th:first-child,
+.table-bordered tr td:first-child {
+    font-weight: 600;
+    color: var(--texte-secondaire);
+    font-size: 0.85rem;
+    background-color: var(--fond-thead);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BOUTONS
+   ══════════════════════════════════════════════════════════════════ */
+.btn {
+    font-family: var(--police-corps);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: var(--rayon-petit);
+    padding: 0.52rem 1.2rem;
+    transition: all var(--transition-vite);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    border-width: 1.5px;
+    letter-spacing: 0.1px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background-color: var(--couleur-primaire);
+    border-color: var(--couleur-primaire);
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(44, 123, 229, 0.30);
+}
+
+.btn-primary:hover {
+    background-color: var(--couleur-primaire-hover);
+    border-color: var(--couleur-primaire-hover);
+    box-shadow: var(--ombre-btn);
+    color: #ffffff !important;
+}
+
+.btn-success {
+    background-color: var(--couleur-succes);
+    border-color: var(--couleur-succes);
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 210, 122, 0.30);
+}
+
+.btn-success:hover {
+    background-color: #00b868;
+    border-color: #00b868;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0, 210, 122, 0.40);
+}
+
+.btn-danger {
+    background-color: var(--couleur-danger);
+    border-color: var(--couleur-danger);
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(230, 55, 87, 0.25);
+}
+
+.btn-danger:hover {
+    background-color: #c8253f;
+    border-color: #c8253f;
+    color: #ffffff !important;
+}
+
+.btn-warning {
+    background-color: var(--couleur-avertissement);
+    border-color: var(--couleur-avertissement);
+    color: #ffffff !important;
+}
+
+.btn-warning:hover {
+    background-color: #d96a28;
+    border-color: #d96a28;
+    color: #ffffff !important;
+}
+
+.btn-secondary {
+    background-color: #edf0f4;
+    border-color: var(--bord-moyen);
+    color: var(--texte-secondaire) !important;
+}
+
+.btn-secondary:hover {
+    background-color: #dde2ea;
+    color: var(--texte-principal) !important;
+    border-color: var(--bord-moyen);
+}
+
+.btn-info {
+    background-color: var(--couleur-info);
+    border-color: var(--couleur-info);
+    color: #ffffff !important;
+}
+
+.btn-info:hover {
+    background-color: #1aa8e0;
+    border-color: #1aa8e0;
+    color: #ffffff !important;
+}
+
+.btn-sm {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.80rem;
+    border-radius: 5px;
+}
+
+.btn-lg {
+    padding: 0.72rem 1.75rem;
+    font-size: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FORMULAIRES — fond blanc, texte sombre, visible garanti
+   ══════════════════════════════════════════════════════════════════ */
+.form-label {
+    font-weight: 600;
+    font-size: 0.855rem;
+    color: var(--texte-principal);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--fond-input);
+    border: 1.5px solid var(--bord-moyen);
+    border-radius: var(--rayon-petit);
+    color: var(--texte-principal);
+    padding: 0.56rem 0.95rem;
+    font-family: var(--police-corps);
+    font-size: 0.915rem;
+    font-weight: 400;
+    transition: border-color var(--transition-vite), box-shadow var(--transition-vite);
+    width: 100%;
+}
+
+.form-control::placeholder {
+    color: var(--texte-leger);
+    font-weight: 400;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #fff;
+    border-color: var(--bord-focus);
+    box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.14);
+    color: var(--texte-principal);
+    outline: none;
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%235a6a7a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    cursor: pointer;
+}
+
+.form-select option {
+    background: #ffffff;
+    color: var(--texte-principal);
+}
+
+.form-control.is-valid {
+    border-color: var(--couleur-succes);
+    box-shadow: 0 0 0 3px rgba(0, 210, 122, 0.12);
+}
+
+.form-control.is-invalid {
+    border-color: var(--couleur-danger);
+    box-shadow: 0 0 0 3px rgba(230, 55, 87, 0.12);
+}
+
+.invalid-feedback {
+    color: var(--couleur-danger);
+    font-size: 0.82rem;
+    margin-top: 0.28rem;
+    font-weight: 500;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ALERTES — textes foncés sur fonds clairs, contraste parfait
+   ══════════════════════════════════════════════════════════════════ */
+.alert {
+    border-radius: var(--rayon);
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: monteeDouce 0.30s ease both;
+}
+
+.alert-success {
+    background-color: var(--couleur-succes-clair);
+    color: var(--couleur-succes-texte);
+    border-color: #b2e8d4;
+    border-left: 4px solid var(--couleur-succes);
+}
+
+.alert-danger {
+    background-color: var(--couleur-danger-clair);
+    color: var(--couleur-danger-texte);
+    border-color: #f5b8c4;
+    border-left: 4px solid var(--couleur-danger);
+}
+
+.alert-info {
+    background-color: var(--couleur-info-clair);
+    color: var(--couleur-info-texte);
+    border-color: #a8dff8;
+    border-left: 4px solid var(--couleur-info);
+}
+
+.alert-warning {
+    background-color: var(--couleur-avertissement-clair);
+    color: var(--couleur-avertissement-texte);
+    border-color: #f8c8a8;
+    border-left: 4px solid var(--couleur-avertissement);
+}
+
+.alert .btn-close {
+    padding: 0.5rem;
+    margin-left: auto;
+    opacity: 0.6;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BADGES — fond coloré, texte sombre ou blanc selon fond
+   ══════════════════════════════════════════════════════════════════ */
+.badge {
+    font-family: var(--police-corps);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.35em 0.75em;
+    border-radius: var(--rayon-pill);
+    letter-spacing: 0.1px;
+}
+
+.badge.bg-primary {
+    background-color: var(--couleur-primaire-clair) !important;
+    color: var(--couleur-primaire) !important;
+    border: 1px solid rgba(44, 123, 229, 0.25);
+}
+
+.badge.bg-success {
+    background-color: var(--couleur-succes-clair) !important;
+    color: var(--couleur-succes-texte) !important;
+    border: 1px solid rgba(0, 210, 122, 0.25);
+}
+
+.badge.bg-danger {
+    background-color: var(--couleur-danger-clair) !important;
+    color: var(--couleur-danger-texte) !important;
+    border: 1px solid rgba(230, 55, 87, 0.25);
+}
+
+.badge.bg-warning {
+    background-color: var(--couleur-avertissement-clair) !important;
+    color: var(--couleur-avertissement-texte) !important;
+    border: 1px solid rgba(245, 128, 62, 0.25);
+}
+
+.badge.bg-info {
+    background-color: var(--couleur-info-clair) !important;
+    color: var(--couleur-info-texte) !important;
+    border: 1px solid rgba(39, 188, 253, 0.25);
+}
+
+.badge.bg-secondary {
+    background-color: #edf0f4 !important;
+    color: var(--texte-secondaire) !important;
+    border: 1px solid var(--bord-leger);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NOTE FINALE — grand affichage lisible
+   ══════════════════════════════════════════════════════════════════ */
+.valeur-note-finale {
+    font-family: var(--police-titre);
+    font-size: 4.5rem;
+    font-weight: 800;
+    color: var(--couleur-succes-texte);
+    line-height: 1;
+    display: block;
+    letter-spacing: -2px;
+    animation: pulseNote 2.5s ease-in-out infinite;
+}
+
+.sous-label-note {
+    font-size: 0.85rem;
+    color: var(--texte-secondaire);
+    margin-top: 5px;
+    display: block;
+    font-weight: 500;
+}
+
+.etiquette-resolution {
+    font-size: 0.88rem;
+    padding: 6px 14px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PANNEAU DÉTAIL CALCUL
+   ══════════════════════════════════════════════════════════════════ */
+.panneau-detail-calcul {
+    background-color: #f5f6fa;
+    border: 1px solid var(--bord-leger);
+    border-radius: var(--rayon);
+    padding: 1.1rem 1.3rem;
+    margin-top: 1rem;
+}
+
+.panneau-detail-calcul h6 {
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--texte-secondaire);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 0.75rem;
+}
+
+.liste-paires-notes {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.75rem;
+}
+
+.liste-paires-notes li {
+    padding: 0.38rem 0;
+    border-bottom: 1px dashed var(--bord-leger);
+    color: var(--texte-secondaire);
+    font-size: 0.87rem;
+    font-family: 'Courier New', monospace;
+}
+
+.liste-paires-notes li:last-child {
+    border-bottom: none;
+}
+
+.total-difference {
+    font-weight: 700;
+    color: var(--couleur-primaire);
+    font-size: 0.9rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   INDICATEURS TEMPS RÉEL
+   ══════════════════════════════════════════════════════════════════ */
+.affichage-difference-temps-reel {
+    color: var(--couleur-primaire);
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+}
+
+.detail-calcul-temps-reel {
+    color: var(--texte-secondaire);
+    font-size: 0.82rem;
+    margin-top: 0.22rem;
+    font-family: 'Courier New', monospace;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITAIRES
+   ══════════════════════════════════════════════════════════════════ */
+hr {
+    border-color: var(--bord-leger);
+    opacity: 1;
+    margin: 1.4rem 0;
+}
+
+.sous-titre-section {
+    font-size: 0.80rem;
+    color: var(--texte-secondaire);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--bord-leger);
+}
+
+/* Stat dashboard */
+.stat-valeur {
+    font-family: var(--police-titre);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--couleur-primaire);
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+    color: var(--texte-leger);
+    margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ══════════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f2f5;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c8d3df;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a0afc0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes monteeDouce {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glisserBas {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseNote {
+    0%, 100% {
+        color: var(--couleur-succes-texte);
+    }
+    50% {
+        color: #009a52;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Délais d'apparition en cascade pour les cartes */
+.card {
+    animation: monteeDouce 0.36s ease both;
+}
+
+.col-md-4:nth-child(1) .card,
+.col-lg-4:nth-child(1) .card { animation-delay: 0.04s; }
+
+.col-md-4:nth-child(2) .card,
+.col-lg-4:nth-child(2) .card { animation-delay: 0.10s; }
+
+.col-md-4:nth-child(3) .card,
+.col-lg-4:nth-child(3) .card { animation-delay: 0.16s; }
+
+.col-md-6:nth-child(2) .card  { animation-delay: 0.10s; }
+
+.alert { animation-delay: 0.08s; }
+
+/* ══════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.15rem; }
+    .container { padding-top: 1.4rem; }
+    .card-body { padding: 1.1rem; }
+    .valeur-note-finale { font-size: 3.2rem; }
+    .stat-valeur { font-size: 1.8rem; }
+    .table thead th,
+    .table tbody td { padding: 0.6rem 0.75rem; }
+}
+
+@media (max-width: 576px) {
+    .btn { width: 100%; justify-content: center; margin-bottom: 0.4rem; }
+    .navbar-brand { font-size: 1rem; }
+}

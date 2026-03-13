@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcul de Note Finale — BAC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Système BAC</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navPrincipal">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/notes">Saisie des Notes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/parametres">Règles de Délibération</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/calcul">Calcul Final</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <h1 style="margin-bottom:0"> Calcul de la Note Finale</h1>
+        <a href="/" class="btn btn-secondary btn-sm">← Retour</a>
+    </div>
+
+    <!-- Alertes -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+         <strong>Erreur :</strong> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+         <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <!-- Panneau de sélection et saisie -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icone-section"></span>
+                    Sélection du candidat et de la matière
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire de sélection -->
+                    <form id="formulaireSelection">
+                        <div class="mb-3">
+                            <label class="form-label">Candidat</label>
+                            <select name="candidatId" id="selectCandidat" class="form-select" required>
+                                <option value="">— Sélectionner un candidat —</option>
+                                <option th:each="candidat : ${candidats}"
+                                        th:value="${candidat.id}"
+                                        th:text="${candidat.prenom + ' ' + candidat.nom}"
+                                        th:selected="${candidat_delibere != null and candidat.id == candidat_delibere.id}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Matière</label>
+                            <select name="matiereId" id="selectMatiere" class="form-select" required>
+                                <option value="">— Sélectionner une matière —</option>
+                                <option th:each="matiere : ${matieres}"
+                                        th:value="${matiere.id}"
+                                        th:text="${matiere.nom}"
+                                        th:selected="${matiere_deliberee != null and matiere.id == matiere_deliberee.id}"></option>
+                            </select>
+                        </div>
+                        <button type="button" id="btnConsulterCopies" class="btn btn-info w-100 mb-3">
+                             Consulter les copies existantes
+                        </button>
+                    </form>
+
+                    <!-- Copies existantes trouvées -->
+                    <div id="panneauCopiesExistantes" style="display:none;" class="alert alert-success mt-3">
+                        <strong>✓ Copies trouvées !</strong>
+                        <p id="detailCopiesExistantes" class="mb-0 mt-2"></p>
+                        <button id="btnDelibererAutomatiquement" class="btn btn-success w-100 mt-3">
+                             Délibérer avec ces notes
+                        </button>
+                    </div>
+
+                    <!-- Saisie manuelle de nouvelles notes -->
+                    <div id="panneauSaisieManuelle" style="display:none;">
+                        <hr>
+                        <p class="sous-titre-section">Ou saisir de nouvelles notes de correction :</p>
+                        <form action="/calcul/resultat" method="post" id="formulaireSaisieNotes">
+                            <input type="hidden" name="candidatId" id="champCandidatId">
+                            <input type="hidden" name="matiereId" id="champMatiereId">
+
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Notes des correcteurs
+                                    <small class="text-muted">(séparées par ; )</small>
+                                </label>
+                                <input type="text" name="notesSaisies" id="champNotesSaisies"
+                                       class="form-control"
+                                       placeholder="ex : 14;12;15"
+                                       th:value="${notesSaisies}">
+                                <div id="retourValidationNotes" class="invalid-feedback"></div>
+                                <small class="text-muted">Entrez les notes séparées par des points-virgules</small>
+                                <div id="affichageEcartTempsReel" class="affichage-difference-temps-reel"></div>
+                                <div id="detailEcartTempsReel" class="detail-calcul-temps-reel"></div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                🧮 Calculer la note finale
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau des copies de ce candidat -->
+            <div class="card carte-informative mt-0"
+                 th:if="${notesExistantes != null and !notesExistantes.isEmpty()}">
+                <div class="card-header">
+                    <span class="icone-section"></span>
+                    Copies enregistrées pour ce candidat
+                </div>
+                <div class="card-body p-0">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Matière</th>
+                                <th>Correcteur</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="copie : ${notesExistantes}">
+                                <td th:text="${copie.matiere.nom}"></td>
+                                <td th:text="${copie.correcteur.prenom + ' ' + copie.correcteur.nom}"></td>
+                                <td>
+                                    <span class="badge bg-primary"
+                                          th:text="${copie.valeur + '/20'}"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résultat de la délibération -->
+        <div class="col-md-6" th:if="${noteFinale != null}">
+            <div class="card carte-resultat-final">
+                <div class="card-header">
+                    <span class="icone-section"></span>
+                    Résultat de la délibération
+                </div>
+                <div class="card-body">
+                    <!-- Note finale mise en valeur -->
+                    <div class="text-center mb-4" style="padding:1.5rem 0">
+                        <span class="valeur-note-finale" th:text="${noteFinale}"></span>
+                        <span class="sous-label-note">Note finale retenue /20</span>
+                    </div>
+
+                    <!-- Tableau récapitulatif -->
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Candidat</th>
+                            <td th:text="${candidat_delibere.prenom + ' ' + candidat_delibere.nom}"></td>
+                        </tr>
+                        <tr>
+                            <th>Matière</th>
+                            <td th:text="${matiere_deliberee.nom}"></td>
+                        </tr>
+                        <tr>
+                            <th>Notes des correcteurs</th>
+                            <td>
+                                <span th:text="${notesSaisies}"></span>
+                                <span class="badge bg-secondary ms-2"
+                                      th:text="${nbNotes + ' copies'}"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type de délibération</th>
+                            <td>
+                                <span class="badge bg-info" th:text="${typeCalcul}"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Écart calculé</th>
+                            <td>
+                                <span class="badge bg-warning"
+                                      style="font-size:0.9rem;padding:0.4em 0.9em"
+                                      th:text="${differenceCalculee + ' pts'}"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Résolution appliquée</th>
+                            <td>
+                                <span class="badge bg-success etiquette-resolution"
+                                      th:text="${resolutionAppliquee}"></span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Détail des écarts entre copies -->
+                    <div class="panneau-detail-calcul" th:if="${detailsPaires != null}">
+                        <h6>Détail du calcul des écarts entre copies</h6>
+                        <ul class="liste-paires-notes">
+                            <li th:each="lignePaire : ${detailsPaires}"
+                                th:text="${lignePaire}"></li>
+                        </ul>
+                        <p class="total-difference text-end mb-0">
+                            Écart total =
+                            <span th:text="${differenceCalculee}"></span> pts
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectCandidat       = document.getElementById('selectCandidat');
+    const selectMatiere        = document.getElementById('selectMatiere');
+    const btnConsulterCopies   = document.getElementById('btnConsulterCopies');
+    const panneauCopies        = document.getElementById('panneauCopiesExistantes');
+    const detailCopies         = document.getElementById('detailCopiesExistantes');
+    const panneauSaisie        = document.getElementById('panneauSaisieManuelle');
+    const champNotes           = document.getElementById('champNotesSaisies');
+    const champCandidatId      = document.getElementById('champCandidatId');
+    const champMatiereId       = document.getElementById('champMatiereId');
+    const btnDeliberer         = document.getElementById('btnDelibererAutomatiquement');
+    const retourValidation     = document.getElementById('retourValidationNotes');
+    const affichageEcart       = document.getElementById('affichageEcartTempsReel');
+    const detailEcart          = document.getElementById('detailEcartTempsReel');
+
+    let donneesCopiesExistantes = null;
+
+    /* ── Consultation des copies existantes ── */
+    async function consulterCopiesExistantes() {
+        const candidatId = selectCandidat.value;
+        const matiereId  = selectMatiere.value;
+
+        if (!candidatId || !matiereId) {
+            alert('Veuillez sélectionner un candidat et une matière');
+            return;
+        }
+
+        try {
+            const reponse = await fetch(`/calcul/notes-candidat?candidatId=${candidatId}&matiereId=${matiereId}`);
+            const copies  = await reponse.json();
+
+            if (copies && copies.length > 0) {
+                donneesCopiesExistantes = copies;
+                const listeNotes      = copies.map(c => c.valeur).join(' ; ');
+                const listeCorrecteurs = copies.map(c => c.correcteur.prenom + ' ' + c.correcteur.nom).join(', ');
+
+                detailCopies.innerHTML = `
+                    <strong>Notes :</strong> ${listeNotes}<br>
+                    <strong>Correcteurs :</strong> ${listeCorrecteurs}<br>
+                    <strong>Nombre de copies :</strong> ${copies.length}
+                `;
+                panneauCopies.style.display = 'block';
+                panneauSaisie.style.display = 'block';
+                champCandidatId.value = candidatId;
+                champMatiereId.value  = matiereId;
+            } else {
+                donneesCopiesExistantes = null;
+                panneauCopies.style.display = 'none';
+                panneauSaisie.style.display = 'block';
+                champCandidatId.value = candidatId;
+                champMatiereId.value  = matiereId;
+            }
+        } catch (erreur) {
+            console.error('Erreur lors de la consultation des copies :', erreur);
+            alert('Impossible de consulter les copies. Veuillez réessayer.');
+        }
+    }
+
+    /* ── Délibération automatique avec les copies existantes ── */
+    function declencherDeliberation() {
+        if (!donneesCopiesExistantes || donneesCopiesExistantes.length === 0) return;
+
+        const formulaire = document.createElement('form');
+        formulaire.method = 'POST';
+        formulaire.action = '/calcul/resultat-auto';
+
+        const inputCandidat = document.createElement('input');
+        inputCandidat.type  = 'hidden';
+        inputCandidat.name  = 'candidatId';
+        inputCandidat.value = selectCandidat.value;
+
+        const inputMatiere = document.createElement('input');
+        inputMatiere.type  = 'hidden';
+        inputMatiere.name  = 'matiereId';
+        inputMatiere.value = selectMatiere.value;
+
+        formulaire.appendChild(inputCandidat);
+        formulaire.appendChild(inputMatiere);
+        document.body.appendChild(formulaire);
+        formulaire.submit();
+    }
+
+    /* ── Calcul de l'écart en temps réel ── */
+    function calculerEcartTempsReel(notes) {
+        let ecartTotal = 0;
+        const detailsPaires = [];
+
+        for (let i = 0; i < notes.length; i++) {
+            for (let j = i + 1; j < notes.length; j++) {
+                const diff = Math.abs(notes[i] - notes[j]);
+                ecartTotal += diff;
+                detailsPaires.push(`${notes[i].toFixed(1)} − ${notes[j].toFixed(1)} = ${diff.toFixed(1)}`);
+            }
+        }
+
+        if (affichageEcart) {
+            affichageEcart.textContent = `Écart calculé : ${ecartTotal.toFixed(2)} pts`;
+        }
+        if (detailEcart && detailsPaires.length > 0) {
+            detailEcart.innerHTML = '<strong>Détail :</strong> ' + detailsPaires.join(' | ');
+        } else if (detailEcart) {
+            detailEcart.innerHTML = '';
+        }
+    }
+
+    function reinitialiserIndicateurs(input) {
+        input.classList.remove('is-invalid', 'is-valid');
+        if (retourValidation) retourValidation.style.display = 'none';
+        if (affichageEcart) affichageEcart.textContent = '';
+        if (detailEcart)    detailEcart.innerHTML = '';
+    }
+
+    /* ── Validation en temps réel des notes saisies ── */
+    function validerNotesSaisies(input) {
+        const saisie = input.value.trim();
+        if (!saisie) { reinitialiserIndicateurs(input); return; }
+
+        const tableauNotes = saisie.split(';').map(n => n.trim());
+        const notesValidees = [];
+        let messageErreur = '';
+        let estValide = true;
+
+        for (const noteStr of tableauNotes) {
+            if (!noteStr) { estValide = false; messageErreur = 'Note vide détectée entre deux points-virgules'; break; }
+            const valeur = parseFloat(noteStr);
+            if (isNaN(valeur)) { estValide = false; messageErreur = `"${noteStr}" n'est pas un nombre valide`; break; }
+            if (valeur < 0 || valeur > 20) { estValide = false; messageErreur = `La note ${valeur} doit être comprise entre 0 et 20`; break; }
+            notesValidees.push(valeur);
+        }
+
+        if (!estValide) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            if (retourValidation) { retourValidation.textContent = messageErreur; retourValidation.style.display = 'block'; }
+            if (affichageEcart) affichageEcart.textContent = '';
+            if (detailEcart)    detailEcart.innerHTML = '';
+        } else {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+            if (retourValidation) retourValidation.style.display = 'none';
+            if (notesValidees.length >= 2) calculerEcartTempsReel(notesValidees);
+        }
+    }
+
+    /* ── Synchronisation des champs cachés ── */
+    if (selectCandidat) {
+        selectCandidat.addEventListener('change', function () {
+            if (champCandidatId) champCandidatId.value = this.value;
+        });
+    }
+    if (selectMatiere) {
+        selectMatiere.addEventListener('change', function () {
+            if (champMatiereId) champMatiereId.value = this.value;
+        });
+    }
+
+    /* ── Branchement des événements ── */
+    if (btnConsulterCopies) btnConsulterCopies.addEventListener('click', consulterCopiesExistantes);
+    if (btnDeliberer)       btnDeliberer.addEventListener('click', declencherDeliberation);
+    if (champNotes)         champNotes.addEventListener('input', function () { validerNotesSaisies(this); });
+});
+</script>
+</body>
+</html>

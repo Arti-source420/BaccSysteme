@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système BAC — Accueil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Système BAC</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPrincipal">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navPrincipal">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="/">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/notes">Saisie des Notes</a></li>
+                <li class="nav-item"><a class="nav-link" href="/parametres">Règles de Délibération</a></li>
+                <li class="nav-item"><a class="nav-link" href="/calcul">Calcul Final</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h1>Tableau de Bord</h1>
+        <p class="text-muted">Gestion des notes et délibération du Baccalauréat</p>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div style="font-size:2rem;font-weight:800;color:var(--couleur-accent-clair)" th:text="${#lists.size(candidats)}">0</div>
+                    <div class="text-muted" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.6px">Candidats</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div style="font-size:2rem;font-weight:800;color:var(--couleur-accent-clair)" th:text="${#lists.size(matieres)}">0</div>
+                    <div class="text-muted" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.6px">Matières</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div style="font-size:2rem;font-weight:800;color:var(--couleur-accent-clair)" th:text="${#lists.size(notes)}">0</div>
+                    <div class="text-muted" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.6px">Notes saisies</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body py-3">
+                    <div style="font-size:2rem;font-weight:800;color:var(--couleur-accent-clair)" th:text="${#lists.size(parametres)}">0</div>
+                    <div class="text-muted" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.6px">Règles actives</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules principaux -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card carte-module">
+                <div class="card-body">
+                    <span class="icone-module"></span>
+                    <span class="titre-module">Saisie des Notes</span>
+                    <span class="description-module">Enregistrer et gérer les notes attribuées par les correcteurs à chaque candidat par matière</span>
+                    <a href="/notes" class="btn btn-primary w-100">Accéder</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card carte-module">
+                <div class="card-body">
+                    <span class="icone-module"></span>
+                    <span class="titre-module">Règles de Délibération</span>
+                    <span class="description-module">Configurer les seuils et résolutions appliqués lors de la délibération du jury du Baccalauréat</span>
+                    <a href="/parametres" class="btn btn-warning w-100">Accéder</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card carte-module">
+                <div class="card-body">
+                    <span class="icone-module"></span>
+                    <span class="titre-module">Calcul de la Note Finale</span>
+                    <span class="description-module">Calculer la note finale d'un candidat selon les règles de délibération paramétrées</span>
+                    <a href="/calcul" class="btn btn-success w-100">Calculer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
