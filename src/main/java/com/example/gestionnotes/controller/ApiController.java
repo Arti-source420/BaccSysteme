@@ -204,7 +204,7 @@ public ResponseEntity<Map<String, Object>> calculerNoteFinale(
         return correcteurRepository.findAll();
     }
     
-    @GetMapping("operateurs")
+    @GetMapping("/operateurs")
     public List<Operateur> getAllOperateurs() {
         return operateurRepository.findAll();
     }

@@ -28,7 +28,7 @@
 
 <div class="container">
     <div class="d-flex align-items-center gap-3 mb-4">
-        <h1 style="margin-bottom:0"> Calcul de la Note Finale</h1>
+        <h1 style="margin-bottom:0"> ETU3631</h1>
         <a href="/" class="btn btn-secondary btn-sm">← Retour</a>
     </div>
 
@@ -203,6 +203,15 @@
                             </td>
                         </tr>
                     </table>
+
+                    <!-- Explication de la sélection de règle (conflits éventuels) -->
+                    <div th:if="${explicationSelection != null}"
+                         th:classappend="${#strings.contains(explicationSelection,'Conflit') ? 'alert alert-warning' : 'alert alert-info'}"
+                         class="alert mt-3 mb-3" style="white-space: pre-line; font-size: 0.85rem;">
+                        <strong th:if="${#strings.contains(explicationSelection,'Conflit')}">⚠ Conflit de règles résolu</strong>
+                        <strong th:unless="${#strings.contains(explicationSelection,'Conflit')}">ℹ Règle appliquée</strong>
+                        <div th:text="${explicationSelection}" class="mt-1"></div>
+                    </div>
 
                     <!-- Détail des écarts entre copies -->
                     <div class="panneau-detail-calcul" th:if="${detailsPaires != null}">
