@@ -6,7 +6,8 @@
 *.war
 *.ear
 *.nar
-
+todo.md
+table.sql
 
 # ==============================
 # Maven

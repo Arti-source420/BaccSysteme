@@ -11,7 +11,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
 
 @Controller
 @RequestMapping("/")
@@ -255,8 +254,9 @@ public class WebController {
             Double noteFinale = calculationService.traiterSaisieNotes(
                     notesSaisies, candidatId, matiereId, idsCorrecteurs);
             
-            // Déterminer quelle résolution a été appliquée
-            String resolutionAppliquee = determinerResolution(noteFinale, notesList);
+            // Résolution appliquée + explication de la sélection (gestion des conflits)
+            String resolutionAppliquee = calculationService.identifierResolutionAppliquee(noteFinale, notesList);
+            String explicationSelection = calculationService.obtenirExplicationSelection(matiereId, difference);
             
             // Préparer les données pour la vue
             model.addAttribute("noteFinale", noteFinale);
@@ -268,6 +268,8 @@ public class WebController {
             model.addAttribute("detailsPaires", detailsPaires);
             model.addAttribute("detailsCalcul", detailsCalcul.toString());
             model.addAttribute("resolutionAppliquee", resolutionAppliquee);
+            model.addAttribute("explicationSelection", explicationSelection);
+            model.addAttribute("typeCalcul", "Saisie manuelle");
             
             // Récupérer les notes existantes pour ce candidat et cette matière
             List<Note> notesExistantes = noteRepository.findByCandidatIdAndMatiereId(candidatId, matiereId);
@@ -287,32 +289,6 @@ public class WebController {
         model.addAttribute("correcteurs", correcteurRepository.findAll());
         
         return "calcul";
-    }
-    
-    /**
-     * Détermine quelle résolution a été appliquée
-     */
-    private String determinerResolution(Double noteFinale, List<Double> notes) {
-        if (notes == null || notes.isEmpty()) {
-            return "inconnue";
-        }
-        
-        double min = Collections.min(notes);
-        double max = Collections.max(notes);
-        double moyenne = notes.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-        
-        // Utiliser une petite marge d'erreur pour les comparaisons de doubles
-        double epsilon = 0.001;
-        
-        if (Math.abs(noteFinale - min) < epsilon) {
-            return "plus petit";
-        } else if (Math.abs(noteFinale - max) < epsilon) {
-            return "plus grand";
-        } else if (Math.abs(noteFinale - moyenne) < epsilon) {
-            return "moyenne";
-        } else {
-            return "moyenne"; // Par défaut
-        }
     }
     
     // ============= Méthodes supplémentaires utiles =============
@@ -376,8 +352,9 @@ public String calculateFinalNoteAuto(
             }
         }
         
-        // Déterminer la résolution appliquée
-        String resolutionAppliquee = determinerResolution(noteFinale, notesList);
+        // Déterminer la résolution appliquée + explication du conflit
+        String resolutionAppliquee = calculationService.identifierResolutionAppliquee(noteFinale, notesList);
+        String explicationSelection = calculationService.obtenirExplicationSelection(matiereId, difference);
         
         // Ajouter les attributs au modèle
         model.addAttribute("noteFinale", noteFinale);
@@ -388,6 +365,7 @@ public String calculateFinalNoteAuto(
         model.addAttribute("differenceCalculee", difference);
         model.addAttribute("detailsPaires", detailsPaires);
         model.addAttribute("resolutionAppliquee", resolutionAppliquee);
+        model.addAttribute("explicationSelection", explicationSelection);
         model.addAttribute("typeCalcul", "Automatique (notes existantes)");
         model.addAttribute("notesExistantes", notesExistantes);
         
