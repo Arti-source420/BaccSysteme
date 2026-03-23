@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Demandes', ~{::content}, 'demandes')}">
+<body>
+<th:block th:fragment="content">
+
+  <div th:if="${successMessage}" class="alert alert-success">
+    <span class="alert-icon">✅</span>
+    <span th:text="${successMessage}"></span>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger">
+    <span class="alert-icon">❌</span>
+    <span th:text="${errorMessage}"></span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Demandes</span>
+      </div>
+      <h1>Demandes</h1>
+      <p>Gérez les demandes de forage de vos clients</p>
+    </div>
+    <a th:href="@{/demandes/nouvelle}" class="btn btn-primary">
+      <span>+</span> Nouvelle demande
+    </a>
+  </div>
+
+  <!-- Search -->
+  <form th:action="@{/demandes}" method="get" class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" name="search" class="search-input"
+             placeholder="Rechercher par lieu ou district..."
+             th:value="${search}"/>
+    </div>
+    <button type="submit" class="btn btn-secondary">Rechercher</button>
+    <a th:if="${search}" th:href="@{/demandes}" class="btn btn-secondary">✕ Effacer</a>
+  </form>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <span class="table-header-title">Liste des demandes</span>
+      <span class="table-count" th:text="${demandes.size()} + ' demande(s)'">0 demande(s)</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(demandes)}" class="empty-state">
+      <div class="empty-state-icon">📋</div>
+      <h3>Aucune demande trouvée</h3>
+      <p th:if="${search}">Aucun résultat pour "<span th:text="${search}"></span>"</p>
+      <p th:unless="${search}">Créez votre première demande de forage</p>
+      <a th:href="@{/demandes/nouvelle}" class="btn btn-primary">+ Nouvelle demande</a>
+    </div>
+
+    <table th:unless="${#lists.isEmpty(demandes)}">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Lieu</th>
+          <th>District</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="d, stat : ${demandes}">
+          <td class="td-muted" th:text="${stat.count}">1</td>
+          <td>
+            <a th:href="@{/clients/{id}/detail(id=${d.client.id})}"
+               style="color: var(--accent); text-decoration: none; font-weight:600;"
+               th:text="${d.client.nom}">—</a>
+          </td>
+          <td class="fw-600" th:text="${d.lieu}">—</td>
+          <td class="td-muted" th:text="${d.district}">—</td>
+          <td class="td-muted" th:text="${#temporals.format(d.date,'dd/MM/yyyy')}">—</td>
+          <td>
+            <div class="td-actions">
+              <a th:href="@{/demandes/{id}/detail(id=${d.id})}"
+                 class="btn btn-sm btn-secondary" title="Détail">👁</a>
+              <a th:href="@{/demandes/{id}/modifier(id=${d.id})}"
+                 class="btn btn-sm btn-secondary" title="Modifier">✏️</a>
+              <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
+                      th:onclick="|openDeleteModal('/demandes/' + ${d.id} + '/supprimer', '${d.lieu}')|">
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</th:block>
+</body>
+</html>

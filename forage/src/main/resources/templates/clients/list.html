@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Clients', ~{::content}, 'clients')}">
+<body>
+<th:block th:fragment="content">
+
+  <!-- Alerts -->
+  <div th:if="${successMessage}" class="alert alert-success">
+    <span class="alert-icon">✅</span>
+    <span th:text="${successMessage}"></span>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger">
+    <span class="alert-icon">❌</span>
+    <span th:text="${errorMessage}"></span>
+  </div>
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Clients</span>
+      </div>
+      <h1>Clients</h1>
+      <p>Gérez vos clients et leurs informations</p>
+    </div>
+    <a th:href="@{/clients/nouveau}" class="btn btn-primary">
+      <span>+</span> Nouveau client
+    </a>
+  </div>
+
+  <!-- Search -->
+  <form th:action="@{/clients}" method="get" class="search-bar">
+    <div class="search-input-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" name="search" class="search-input"
+             placeholder="Rechercher un client par nom..."
+             th:value="${search}"/>
+    </div>
+    <button type="submit" class="btn btn-secondary">Rechercher</button>
+    <a th:if="${search}" th:href="@{/clients}" class="btn btn-secondary">✕ Effacer</a>
+  </form>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <div class="table-header">
+      <span class="table-header-title">Liste des clients</span>
+      <span class="table-count" th:text="${clients.size()} + ' client(s)'">0 client(s)</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(clients)}" class="empty-state">
+      <div class="empty-state-icon">👥</div>
+      <h3>Aucun client trouvé</h3>
+      <p th:if="${search}">Aucun résultat pour "<span th:text="${search}"></span>"</p>
+      <p th:unless="${search}">Commencez par ajouter votre premier client</p>
+      <a th:href="@{/clients/nouveau}" class="btn btn-primary">+ Nouveau client</a>
+    </div>
+
+    <table th:unless="${#lists.isEmpty(clients)}">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nom</th>
+          <th>Contact</th>
+          <th>Demandes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="client, stat : ${clients}">
+          <td class="td-muted" th:text="${stat.count}">1</td>
+          <td>
+            <span class="fw-600" th:text="${client.nom}">Nom</span>
+          </td>
+          <td class="td-muted" th:text="${client.contact}">Contact</td>
+          <td>
+            <span class="badge badge-accent"
+                  th:text="${client.demandes != null ? client.demandes.size() : 0} + ' demande(s)'">
+              0 demande(s)
+            </span>
+          </td>
+          <td>
+            <div class="td-actions">
+              <a th:href="@{/clients/{id}/detail(id=${client.id})}"
+                 class="btn btn-sm btn-secondary" title="Détail">👁</a>
+              <a th:href="@{/clients/{id}/modifier(id=${client.id})}"
+                 class="btn btn-sm btn-secondary" title="Modifier">✏️</a>
+              <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
+                      th:onclick="|openDeleteModal('/clients/' + ${client.id} + '/supprimer', '${client.nom}')|">
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</th:block>
+</body>
+</html>
