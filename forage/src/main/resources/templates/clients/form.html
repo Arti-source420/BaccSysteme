@@ -21,7 +21,7 @@
 
   <div class="card" style="max-width: 700px;">
     <div class="card-header">
-      <div class="card-header-icon">👤</div>
+      <div class="card-header-icon"></div>
       <h2 th:text="${pageTitle}">Client</h2>
     </div>
     <div class="card-body">
@@ -58,8 +58,8 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">
-            <span th:if="${client.id == null}">✓ Créer le client</span>
-            <span th:unless="${client.id == null}">✓ Enregistrer les modifications</span>
+            <span th:if="${client.id == null}"> Créer le client</span>
+            <span th:unless="${client.id == null}"> Enregistrer les modifications</span>
           </button>
           <a th:href="@{/clients}" class="btn btn-secondary">Annuler</a>
         </div>

@@ -6,11 +6,11 @@
 
   <!-- Alerts -->
   <div th:if="${successMessage}" class="alert alert-success">
-    <span class="alert-icon">✅</span>
+    <span class="alert-icon"></span>
     <span th:text="${successMessage}"></span>
   </div>
   <div th:if="${errorMessage}" class="alert alert-danger">
-    <span class="alert-icon">❌</span>
+    <span class="alert-icon"></span>
     <span th:text="${errorMessage}"></span>
   </div>
 
@@ -32,7 +32,7 @@
   <!-- Search -->
   <form th:action="@{/clients}" method="get" class="search-bar">
     <div class="search-input-wrap">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input type="text" name="search" class="search-input"
              placeholder="Rechercher un client par nom..."
              th:value="${search}"/>
@@ -49,7 +49,7 @@
     </div>
 
     <div th:if="${#lists.isEmpty(clients)}" class="empty-state">
-      <div class="empty-state-icon">👥</div>
+      <div class="empty-state-icon"></div>
       <h3>Aucun client trouvé</h3>
       <p th:if="${search}">Aucun résultat pour "<span th:text="${search}"></span>"</p>
       <p th:unless="${search}">Commencez par ajouter votre premier client</p>
@@ -82,12 +82,12 @@
           <td>
             <div class="td-actions">
               <a th:href="@{/clients/{id}/detail(id=${client.id})}"
-                 class="btn btn-sm btn-secondary" title="Détail">👁</a>
+                 class="btn btn-sm btn-secondary" title="Détail"></a>
               <a th:href="@{/clients/{id}/modifier(id=${client.id})}"
-                 class="btn btn-sm btn-secondary" title="Modifier">✏️</a>
+                 class="btn btn-sm btn-secondary" title="Modifier"></a>
               <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
                       th:onclick="|openDeleteModal('/clients/' + ${client.id} + '/supprimer', '${client.nom}')|">
-                🗑
+                
               </button>
             </div>
           </td>

@@ -20,13 +20,13 @@
   </div>
 
   <div th:if="${errorMessage}" class="alert alert-danger">
-    <span class="alert-icon">❌</span>
+    <span class="alert-icon"></span>
     <span th:text="${errorMessage}"></span>
   </div>
 
   <div class="card" style="max-width: 800px;">
     <div class="card-header">
-      <div class="card-header-icon">📋</div>
+      <div class="card-header-icon"></div>
       <h2 th:text="${pageTitle}">Demande</h2>
     </div>
     <div class="card-body">
@@ -93,8 +93,8 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">
-            <span th:if="${demande.id == null}">✓ Créer la demande</span>
-            <span th:unless="${demande.id == null}">✓ Enregistrer les modifications</span>
+            <span th:if="${demande.id == null}"> Créer la demande</span>
+            <span th:unless="${demande.id == null}"> Enregistrer les modifications</span>
           </button>
           <a th:href="@{/demandes}" class="btn btn-secondary">Annuler</a>
         </div>
