@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Détail Client', ~{::content}, 'clients')}">
+<body>
+<th:block th:fragment="content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <a th:href="@{/clients}">Clients</a>
+        <span class="breadcrumb-sep">›</span>
+        <span th:text="${client.nom}">Client</span>
+      </div>
+      <h1 th:text="${client.nom}">Nom client</h1>
+      <p>Fiche client détaillée</p>
+    </div>
+    <div class="d-flex gap-8">
+      <a th:href="@{/clients/{id}/modifier(id=${client.id})}" class="btn btn-primary">✏️ Modifier</a>
+      <a th:href="@{/clients}" class="btn btn-secondary">← Retour</a>
+    </div>
+  </div>
+
+  <div class="card" style="max-width: 800px;">
+    <div class="card-header">
+      <div class="card-header-icon"></div>
+      <h2>Informations du client</h2>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Identifiant</div>
+          <div class="detail-value" th:text="'#' + ${client.id}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Nom</div>
+          <div class="detail-value" th:text="${client.nom}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Contact</div>
+          <div class="detail-value" th:text="${client.contact}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Nombre de demandes</div>
+          <div class="detail-value">
+            <span class="badge badge-accent"
+                  th:text="${client.demandes != null ? client.demandes.size() : 0} + ' demande(s)'">
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Associated demandes -->
+  <div class="card" style="max-width: 800px; margin-top: 24px;"
+       th:if="${client.demandes != null and !#lists.isEmpty(client.demandes)}">
+    <div class="card-header">
+      <div class="card-header-icon"></div>
+      <h2>Demandes associées</h2>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Lieu</th>
+            <th>District</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="d : ${client.demandes}">
+            <td class="td-muted" th:text="${d.id}">—</td>
+            <td th:text="${d.lieu}">—</td>
+            <td class="td-muted" th:text="${d.district}">—</td>
+            <td class="td-muted" th:text="${#temporals.format(d.date,'dd/MM/yyyy')}">—</td>
+            <td>
+              <a th:href="@{/demandes/{id}/detail(id=${d.id})}" class="btn btn-sm btn-secondary">Voir</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delete zone -->
+  <div style="max-width:800px; margin-top: 24px; padding: 20px;
+              background: var(--danger-bg); border: 1px solid rgba(224,92,92,0.2);
+              border-radius: var(--radius-md);">
+    <div class="d-flex align-center justify-between">
+      <div>
+        <div class="fw-600 text-danger">Zone de danger</div>
+        <div class="td-muted" style="font-size:13px; margin-top:2px;">
+          La suppression est définitive et supprimera aussi toutes les demandes associées.
+        </div>
+      </div>
+      <button type="button" class="btn btn-danger btn-delete"
+              th:data-url="@{/clients/{id}/supprimer(id=${client.id})}"
+              th:data-name="${client.nom}">
+         Supprimer
+      </button>
+    </div>
+  </div>
+
+</th:block>
+</body>
+</html>

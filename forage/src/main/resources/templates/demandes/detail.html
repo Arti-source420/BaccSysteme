@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Détail Demande', ~{::content}, 'demandes')}">
+<body>
+<th:block th:fragment="content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <a th:href="@{/demandes}">Demandes</a>
+        <span class="breadcrumb-sep">›</span>
+        <span th:text="${demande.lieu}">Demande</span>
+      </div>
+      <h1 th:text="${demande.lieu}">Lieu</h1>
+      <p>Fiche de demande de forage</p>
+    </div>
+    <div class="d-flex gap-8">
+      <a th:href="@{/demandes/{id}/modifier(id=${demande.id})}" class="btn btn-primary"> Modifier</a>
+      <a th:href="@{/demandes}" class="btn btn-secondary">← Retour</a>
+    </div>
+  </div>
+
+  <div class="card" style="max-width: 800px;">
+    <div class="card-header">
+      <div class="card-header-icon"></div>
+      <h2>Détails de la demande</h2>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Identifiant</div>
+          <div class="detail-value" th:text="'#' + ${demande.id}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Client</div>
+          <div class="detail-value">
+            <a th:href="@{/clients/{id}/detail(id=${demande.client.id})}"
+               style="color: var(--accent); text-decoration:none;"
+               th:text="${demande.client.nom}">—</a>
+          </div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Lieu</div>
+          <div class="detail-value" th:text="${demande.lieu}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">District</div>
+          <div class="detail-value" th:text="${demande.district}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Date</div>
+          <div class="detail-value" th:text="${#temporals.format(demande.date,'dd MMMM yyyy')}">—</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Contact client</div>
+          <div class="detail-value" th:text="${demande.client.contact}">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete zone -->
+  <div style="max-width:800px; margin-top: 24px; padding: 20px;
+              background: var(--danger-bg); border: 1px solid rgba(224,92,92,0.2);
+              border-radius: var(--radius-md);">
+    <div class="d-flex align-center justify-between">
+      <div>
+        <div class="fw-600 text-danger">Zone de danger</div>
+        <div class="td-muted" style="font-size:13px; margin-top:2px;">
+          La suppression de cette demande est définitive et irréversible.
+        </div>
+      </div>
+      <button type="button" class="btn btn-danger btn-delete"
+              th:data-url="@{/demandes/{id}/supprimer(id=${demande.id})}"
+              th:data-name="${demande.lieu}">
+         Supprimer
+      </button>
+    </div>
+  </div>
+
+</th:block>
+</body>
+</html>

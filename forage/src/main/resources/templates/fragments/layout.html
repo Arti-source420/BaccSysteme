@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(title, content, activeMenu)">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${title} + ' — Forage App'">Forage App</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>"/>
+</head>
+<body>
+
+<div class="layout">
+
+ 
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <span class="topbar-title" th:text="${title}">Page</span>
+      <div class="topbar-actions">
+        <div class="topbar-badge">
+          <span></span>
+          <span>Forage Management</span>
+        </div>
+      </div>
+    </header>
+
+  
+    <main class="page-content">
+      <th:block th:replace="${content}"/>
+    </main>
+  </div>
+
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <h3 class="modal-title">Confirmer la suppression</h3>
+    <p class="modal-text" id="deleteModalText">Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
+      <form id="deleteForm" method="post">
+        <input type="hidden" name="_method" value="delete"/>
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

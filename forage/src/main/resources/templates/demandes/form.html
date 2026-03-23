@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${pageTitle}, ~{::content}, 'demandes')}">
+<body>
+<th:block th:fragment="content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <a th:href="@{/demandes}">Demandes</a>
+        <span class="breadcrumb-sep">›</span>
+        <span th:text="${pageTitle}">Formulaire</span>
+      </div>
+      <h1 th:text="${pageTitle}">Demande</h1>
+      <p th:if="${demande.id == null}">Enregistrez une nouvelle demande de forage</p>
+      <p th:unless="${demande.id == null}">Modifiez les informations de la demande</p>
+    </div>
+  </div>
+
+  <div th:if="${errorMessage}" class="alert alert-danger">
+    <span class="alert-icon"></span>
+    <span th:text="${errorMessage}"></span>
+  </div>
+
+  <div class="card" style="max-width: 800px;">
+    <div class="card-header">
+      <div class="card-header-icon"></div>
+      <h2 th:text="${pageTitle}">Demande</h2>
+    </div>
+    <div class="card-body">
+
+      <form th:action="${demande.id == null} ? @{/demandes/nouvelle} : @{/demandes/{id}/modifier(id=${demande.id})}"
+            th:object="${demande}"
+            method="post">
+
+        <div class="form-grid">
+          <!-- Client -->
+          <div class="form-group" style="grid-column: 1/-1;">
+            <label class="form-label" for="clientId">
+              Client <span class="required">*</span>
+            </label>
+            <select id="clientId" name="clientId" class="form-control"
+                    required>
+              <option value="">— Sélectionnez un client —</option>
+              <option th:each="c : ${clients}"
+                      th:value="${c.id}"
+                      th:text="${c.nom}"
+                      th:selected="${demande.client != null and demande.client.id == c.id}">
+              </option>
+            </select>
+          </div>
+
+          <!-- Lieu -->
+          <div class="form-group">
+            <label class="form-label" for="lieu">
+              Lieu <span class="required">*</span>
+            </label>
+            <input type="text" id="lieu" th:field="*{lieu}"
+                   class="form-control"
+                   th:classappend="${#fields.hasErrors('lieu')} ? ' is-invalid' : ''"
+                   placeholder="Lieu du forage"/>
+            <span th:if="${#fields.hasErrors('lieu')}"
+                  th:errors="*{lieu}" class="invalid-feedback"></span>
+          </div>
+
+          <!-- District -->
+          <div class="form-group">
+            <label class="form-label" for="district">
+              District <span class="required">*</span>
+            </label>
+            <input type="text" id="district" th:field="*{district}"
+                   class="form-control"
+                   th:classappend="${#fields.hasErrors('district')} ? ' is-invalid' : ''"
+                   placeholder="District administratif"/>
+            <span th:if="${#fields.hasErrors('district')}"
+                  th:errors="*{district}" class="invalid-feedback"></span>
+          </div>
+
+          <!-- Date -->
+          <div class="form-group">
+            <label class="form-label" for="date">
+              Date <span class="required">*</span>
+            </label>
+            <input type="date" id="date" th:field="*{date}"
+                   class="form-control"
+                   th:classappend="${#fields.hasErrors('date')} ? ' is-invalid' : ''"/>
+            <span th:if="${#fields.hasErrors('date')}"
+                  th:errors="*{date}" class="invalid-feedback"></span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <span th:if="${demande.id == null}"> Créer la demande</span>
+            <span th:unless="${demande.id == null}"> Enregistrer les modifications</span>
+          </button>
+          <a th:href="@{/demandes}" class="btn btn-secondary">Annuler</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</th:block>
+</body>
+</html>
