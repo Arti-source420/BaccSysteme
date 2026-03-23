@@ -16,7 +16,7 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       <a class="brand-logo" th:href="@{/}">
-        <div class="brand-icon"></div>
+        <div class="brand-icon">⛏️</div>
         <div class="brand-text">
           <span class="brand-name">Forage</span>
           <span class="brand-sub">Gestion</span>
@@ -29,7 +29,7 @@
 
       <a th:href="@{/}" class="nav-link"
          th:classappend="${activeMenu == 'home'} ? ' active' : ''">
-        <span class="nav-icon"></span>
+        <span class="nav-icon">🏠</span>
         Tableau de bord
       </a>
 
@@ -37,13 +37,13 @@
 
       <a th:href="@{/clients}" class="nav-link"
          th:classappend="${activeMenu == 'clients'} ? ' active' : ''">
-        <span class="nav-icon"></span>
+        <span class="nav-icon">👥</span>
         Clients
       </a>
 
       <a th:href="@{/demandes}" class="nav-link"
          th:classappend="${activeMenu == 'demandes'} ? ' active' : ''">
-        <span class="nav-icon"></span>
+        <span class="nav-icon">📋</span>
         Demandes
       </a>
     </nav>
@@ -61,7 +61,7 @@
       <span class="topbar-title" th:text="${title}">Page</span>
       <div class="topbar-actions">
         <div class="topbar-badge">
-          <span></span>
+          <span>⛏️</span>
           <span>Forage Management</span>
         </div>
       </div>
@@ -78,7 +78,7 @@
 <!-- Confirm Delete Modal -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-box">
-    <div class="modal-icon"></div>
+    <div class="modal-icon">⚠️</div>
     <h3 class="modal-title">Confirmer la suppression</h3>
     <p class="modal-text" id="deleteModalText">Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
     <div class="modal-actions">

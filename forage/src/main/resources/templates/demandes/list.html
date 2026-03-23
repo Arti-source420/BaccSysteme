@@ -5,11 +5,11 @@
 <th:block th:fragment="content">
 
   <div th:if="${successMessage}" class="alert alert-success">
-    <span class="alert-icon"></span>
+    <span class="alert-icon">✅</span>
     <span th:text="${successMessage}"></span>
   </div>
   <div th:if="${errorMessage}" class="alert alert-danger">
-    <span class="alert-icon"></span>
+    <span class="alert-icon">❌</span>
     <span th:text="${errorMessage}"></span>
   </div>
 
@@ -31,7 +31,7 @@
   <!-- Search -->
   <form th:action="@{/demandes}" method="get" class="search-bar">
     <div class="search-input-wrap">
-      <span class="search-icon"></span>
+      <span class="search-icon">🔍</span>
       <input type="text" name="search" class="search-input"
              placeholder="Rechercher par lieu ou district..."
              th:value="${search}"/>
@@ -48,7 +48,7 @@
     </div>
 
     <div th:if="${#lists.isEmpty(demandes)}" class="empty-state">
-      <div class="empty-state-icon"></div>
+      <div class="empty-state-icon">📋</div>
       <h3>Aucune demande trouvée</h3>
       <p th:if="${search}">Aucun résultat pour "<span th:text="${search}"></span>"</p>
       <p th:unless="${search}">Créez votre première demande de forage</p>
@@ -80,12 +80,13 @@
           <td>
             <div class="td-actions">
               <a th:href="@{/demandes/{id}/detail(id=${d.id})}"
-                 class="btn btn-sm btn-secondary" title="Détail"></a>
+                 class="btn btn-sm btn-secondary" title="Détail">👁</a>
               <a th:href="@{/demandes/{id}/modifier(id=${d.id})}"
-                 class="btn btn-sm btn-secondary" title="Modifier"></a>
-              <button type="button" class="btn btn-sm btn-danger" title="Supprimer"
-                      th:onclick="|openDeleteModal('/demandes/' + ${d.id} + '/supprimer', '${d.lieu}')|">
-                
+                 class="btn btn-sm btn-secondary" title="Modifier">✏️</a>
+              <button type="button" class="btn btn-sm btn-danger btn-delete" title="Supprimer"
+                      th:data-url="@{/demandes/{id}/supprimer(id=${d.id})}"
+                      th:data-name="${d.lieu}">
+                🗑
               </button>
             </div>
           </td>
