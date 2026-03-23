@@ -6,11 +6,11 @@
 
   <!-- Alerts -->
   <div th:if="${successMessage}" class="alert alert-success">
-    <span class="alert-icon">✅</span>
+    <span class="alert-icon"></span>
     <span th:text="${successMessage}"></span>
   </div>
   <div th:if="${errorMessage}" class="alert alert-danger">
-    <span class="alert-icon">❌</span>
+    <span class="alert-icon"></span>
     <span th:text="${errorMessage}"></span>
   </div>
 
@@ -21,7 +21,6 @@
         <span class="breadcrumb-sep">›</span>
         <span>Clients</span>
       </div>
-      <h1>Clients</h1>
       <p>Gérez vos clients et leurs informations</p>
     </div>
     <a th:href="@{/clients/nouveau}" class="btn btn-primary">
@@ -32,13 +31,13 @@
   <!-- Search -->
   <form th:action="@{/clients}" method="get" class="search-bar">
     <div class="search-input-wrap">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input type="text" name="search" class="search-input"
              placeholder="Rechercher un client par nom..."
              th:value="${search}"/>
     </div>
     <button type="submit" class="btn btn-secondary">Rechercher</button>
-    <a th:if="${search}" th:href="@{/clients}" class="btn btn-secondary">✕ Effacer</a>
+    <a th:if="${search}" th:href="@{/clients}" class="btn btn-secondary"> Effacer</a>
   </form>
 
   <!-- Table -->
@@ -49,7 +48,7 @@
     </div>
 
     <div th:if="${#lists.isEmpty(clients)}" class="empty-state">
-      <div class="empty-state-icon">👥</div>
+      <div class="empty-state-icon"></div>
       <h3>Aucun client trouvé</h3>
       <p th:if="${search}">Aucun résultat pour "<span th:text="${search}"></span>"</p>
       <p th:unless="${search}">Commencez par ajouter votre premier client</p>

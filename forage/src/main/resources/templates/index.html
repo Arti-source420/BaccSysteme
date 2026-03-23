@@ -6,7 +6,7 @@
 
   <div class="page-header">
     <div class="page-header-left">
-      <h1>Tableau de bord</h1>
+   
       <p>Vue d'ensemble de votre activité de forage</p>
     </div>
   </div>
@@ -14,38 +14,37 @@
   <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-card">
-      <span class="stat-icon">👥</span>
+     
       <div class="stat-value" th:text="${totalClients}">0</div>
       <div class="stat-label">Clients</div>
     </div>
     <div class="stat-card">
-      <span class="stat-icon">📋</span>
+      
       <div class="stat-value" th:text="${totalDemandes}">0</div>
       <div class="stat-label">Demandes</div>
     </div>
     <div class="stat-card">
-      <span class="stat-icon">⛏️</span>
-      <div class="stat-value">—</div>
+     
+      <!-- <div class="stat-value">—</div>
       <div class="stat-label">Forages actifs</div>
     </div>
     <div class="stat-card">
-      <span class="stat-icon">✅</span>
       <div class="stat-value">—</div>
       <div class="stat-label">Terminés</div>
     </div>
-  </div>
+  </div> -->
 
   <div class="dashboard-grid">
 
     <!-- Recent Demandes -->
     <div class="card">
       <div class="card-header">
-        <div class="card-header-icon">📋</div>
+        <div class="card-header-icon"></div>
         <h2>Demandes récentes</h2>
       </div>
       <div class="card-body" style="padding:0;">
         <div th:if="${#lists.isEmpty(recentDemandes)}" class="empty-state" style="padding:40px 20px;">
-          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-icon"></div>
           <p>Aucune demande enregistrée</p>
         </div>
         <table th:if="${!#lists.isEmpty(recentDemandes)}">
@@ -76,22 +75,22 @@
     <!-- Quick Actions -->
     <div class="card">
       <div class="card-header">
-        <div class="card-header-icon">⚡</div>
+        <div class="card-header-icon"></div>
         <h2>Actions rapides</h2>
       </div>
       <div class="card-body" style="display:flex; flex-direction:column; gap:12px;">
         <a th:href="@{/clients/nouveau}" class="btn btn-primary" style="justify-content:center; padding:14px;">
-          <span>👤</span> Nouveau Client
+          <span></span> Nouveau Client
         </a>
         <a th:href="@{/demandes/nouvelle}" class="btn btn-secondary" style="justify-content:center; padding:14px;">
-          <span>📋</span> Nouvelle Demande
+          <span></span> Nouvelle Demande
         </a>
         <div class="divider" style="margin:4px 0;"></div>
         <a th:href="@{/clients}" class="btn btn-secondary" style="justify-content:center; padding:14px;">
-          <span>👥</span> Voir tous les clients
+          <span></span> Voir tous les clients
         </a>
         <a th:href="@{/demandes}" class="btn btn-secondary" style="justify-content:center; padding:14px;">
-          <span>📂</span> Voir toutes les demandes
+          <span></span> Voir toutes les demandes
         </a>
       </div>
     </div>

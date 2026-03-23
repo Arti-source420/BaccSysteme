@@ -24,7 +24,7 @@
 
   <div class="card" style="max-width: 800px;">
     <div class="card-header">
-      <div class="card-header-icon">👤</div>
+      <div class="card-header-icon"></div>
       <h2>Informations du client</h2>
     </div>
     <div class="card-body">
@@ -57,7 +57,7 @@
   <div class="card" style="max-width: 800px; margin-top: 24px;"
        th:if="${client.demandes != null and !#lists.isEmpty(client.demandes)}">
     <div class="card-header">
-      <div class="card-header-icon">📋</div>
+      <div class="card-header-icon"></div>
       <h2>Demandes associées</h2>
     </div>
     <div class="card-body" style="padding: 0;">
@@ -100,7 +100,7 @@
       <button type="button" class="btn btn-danger btn-delete"
               th:data-url="@{/clients/{id}/supprimer(id=${client.id})}"
               th:data-name="${client.nom}">
-        🗑 Supprimer
+         Supprimer
       </button>
     </div>
   </div>
