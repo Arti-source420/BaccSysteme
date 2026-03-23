@@ -60,3 +60,59 @@ CREATE TABLE IF NOT EXISTS demande_status (
 -- Sample data
 INSERT INTO status (libelle) VALUES ('En attente'), ('En cours'), ('Terminée'), ('Annulée');
 INSERT INTO types_devis (libelle) VALUES ('Forage manuel'), ('Forage motorisé'), ('Forage profond');
+
+-- ══════════════════════════════════════════
+-- CLIENTS
+-- ══════════════════════════════════════════
+INSERT INTO clients (nom, contact) VALUES
+  ('Rakoto Jean',        '034 12 345 67'),
+  ('Rabe Marie',         '033 98 765 43'),
+  ('Andrianaivo Paul',   'andrianaivo.paul@gmail.com'),
+  ('Rasoa Hanta',        '032 55 111 22');
+
+-- ══════════════════════════════════════════
+-- DEMANDES
+-- ══════════════════════════════════════════
+INSERT INTO demandes (date, lieu, district, client_id) VALUES
+  ('2024-01-15', 'Ambohimanga',    'Manjakandriana', 1),
+  ('2024-02-03', 'Anosibe',        'Antananarivo Atsimondrano', 2),
+  ('2024-03-20', 'Mahitsy',        'Ambohidratrimo', 3),
+  ('2024-04-10', 'Tanjombato',     'Antananarivo Atsimondrano', 4);
+
+-- ══════════════════════════════════════════
+-- DEVIS
+-- ══════════════════════════════════════════
+INSERT INTO devis (date, montant_total, type_devis_id, demande_id) VALUES
+  ('2024-01-20', 4500000.00, 1, 1),
+  ('2024-02-08', 8750000.00, 2, 2),
+  ('2024-03-25', 15000000.00, 3, 3),
+  ('2024-04-15', 6200000.00, 2, 4);
+
+-- ══════════════════════════════════════════
+-- DETAILS_DEVIS
+-- ══════════════════════════════════════════
+INSERT INTO details_devis (libelle, montant, devis_id) VALUES
+  ('Main d''œuvre forage manuel',       2000000.00, 1),
+  ('Fourniture tuyaux PVC',             1500000.00, 1),
+  ('Transport et déplacement',          1000000.00, 1),
+
+  ('Location foreuse motorisée',        4000000.00, 2),
+  ('Carburant et lubrifiants',          1250000.00, 2),
+  ('Main d''œuvre spécialisée',         3500000.00, 2),
+
+  ('Forage profond 80m',                9000000.00, 3),
+  ('Pompe immergée + installation',     4000000.00, 3),
+  ('Génie civil (dalle, margelle)',     2000000.00, 3),
+
+  ('Location foreuse semi-lourde',      3200000.00, 4),
+  ('Main d''œuvre et encadrement',      2000000.00, 4),
+  ('Fournitures et consommables',       1000000.00, 4);
+
+-- ══════════════════════════════════════════
+-- DEMANDE_STATUS
+-- ══════════════════════════════════════════
+INSERT INTO demande_status (date, commentaire, demande_id, status_id) VALUES
+  ('2024-01-15 08:00:00', 'Demande reçue, en attente d''étude',          1, 1),
+  ('2024-02-03 09:30:00', 'Devis validé, travaux en cours',              2, 2),
+  ('2024-03-20 10:00:00', 'Forage terminé, réception effectuée',         3, 3),
+  ('2024-04-10 14:00:00', 'Client injoignable, dossier mis en attente',  4, 1);
