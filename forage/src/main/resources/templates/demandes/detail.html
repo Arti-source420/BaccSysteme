@@ -4,6 +4,11 @@
 <body>
 <th:block th:fragment="content">
 
+  <!-- Alerts -->
+  <div th:if="${successMessage}" class="alert alert-success">✅ <span th:text="${successMessage}"></span></div>
+  <div th:if="${errorMessage}"   class="alert alert-danger">❌ <span th:text="${errorMessage}"></span></div>
+
+  <!-- Header -->
   <div class="page-header">
     <div class="page-header-left">
       <div class="breadcrumb">
@@ -17,15 +22,15 @@
       <p>Fiche de demande de forage</p>
     </div>
     <div class="d-flex gap-8">
-      <a th:href="@{/demandes/{id}/modifier(id=${demande.id})}" class="btn btn-primary"> Modifier</a>
+      <a th:href="@{/demandes/{id}/modifier(id=${demande.id})}" class="btn btn-primary">✏️ Modifier</a>
       <a th:href="@{/demandes}" class="btn btn-secondary">← Retour</a>
     </div>
   </div>
 
-  <div class="card" style="max-width: 800px;">
+  <!-- Infos demande -->
+  <div class="card" style="max-width:860px;">
     <div class="card-header">
-      <div class="card-header-icon"></div>
-      <h2>Détails de la demande</h2>
+      <span>📋</span> Détails de la demande
     </div>
     <div class="card-body">
       <div class="detail-grid">
@@ -37,7 +42,6 @@
           <div class="detail-label">Client</div>
           <div class="detail-value">
             <a th:href="@{/clients/{id}/detail(id=${demande.client.id})}"
-               style="color: var(--accent); text-decoration:none;"
                th:text="${demande.client.nom}">—</a>
           </div>
         </div>
@@ -57,27 +61,119 @@
           <div class="detail-label">Contact client</div>
           <div class="detail-value" th:text="${demande.client.contact}">—</div>
         </div>
+        <div class="detail-item">
+          <div class="detail-label">Statut actuel</div>
+          <div class="detail-value">
+            <span th:if="${!#lists.isEmpty(historique)}"
+                  class="status-badge"
+                  th:data-libelle="${historique[0].status.libelle}"
+                  th:text="${historique[0].status.libelle}">—</span>
+            <span th:if="${#lists.isEmpty(historique)}" class="badge badge-secondary">Non défini</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Delete zone -->
-  <div style="max-width:800px; margin-top: 24px; padding: 20px;
-              background: var(--danger-bg); border: 1px solid rgba(224,92,92,0.2);
-              border-radius: var(--radius-md);">
-    <div class="d-flex align-center justify-between">
-      <div>
-        <div class="fw-600 text-danger">Zone de danger</div>
-        <div class="td-muted" style="font-size:13px; margin-top:2px;">
-          La suppression de cette demande est définitive et irréversible.
+  <!-- ═══════════════════════════════════════════════════
+       HISTORIQUE DES STATUTS
+       ═══════════════════════════════════════════════════ -->
+  <div class="card" style="max-width:860px;">
+    <div class="card-header">
+      <span>🕒</span> Historique des statuts
+      <span class="table-badge" style="margin-left:auto;"
+            th:text="${historique.size()} + ' entrée(s)'"></span>
+    </div>
+    <div class="card-body" style="padding:0;">
+
+      <div th:if="${#lists.isEmpty(historique)}" class="empty-state" style="padding:2.5rem;">
+        <span class="empty-state-icon">📭</span>
+        <h3>Aucun suivi enregistré</h3>
+        <p>Ajoutez un statut ci-dessous pour commencer le suivi.</p>
+      </div>
+
+      <!-- Timeline -->
+      <div th:unless="${#lists.isEmpty(historique)}" class="timeline-wrapper">
+        <div th:each="ds, stat : ${historique}" class="timeline-item"
+             th:classappend="${stat.first} ? ' timeline-item--first' : ''">
+          <div class="timeline-dot"
+               th:data-libelle="${ds.status.libelle}"></div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="status-badge"
+                    th:data-libelle="${ds.status.libelle}"
+                    th:text="${ds.status.libelle}">—</span>
+              <span class="timeline-date"
+                    th:text="${#temporals.format(ds.date,'dd/MM/yyyy HH:mm')}">—</span>
+              <span th:if="${stat.first}" class="badge badge-primary" style="font-size:.65rem;">Actuel</span>
+            </div>
+            <div th:if="${ds.commentaire != null and !ds.commentaire.isBlank()}"
+                 class="timeline-comment"
+                 th:text="${ds.commentaire}">—</div>
+            <div th:unless="${ds.commentaire != null and !ds.commentaire.isBlank()}"
+                 class="timeline-comment timeline-comment--empty">Aucun commentaire</div>
+          </div>
+          <!-- Supprimer entrée -->
+          <form th:action="@{/demandes/{did}/statut/{sid}/supprimer(did=${demande.id},sid=${ds.id})}"
+                method="post" style="margin-left:auto; flex-shrink:0;">
+            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer cette entrée"
+                    onclick="return confirm('Supprimer cette entrée de suivi ?')">🗑</button>
+          </form>
         </div>
       </div>
-      <button type="button" class="btn btn-danger btn-delete"
-              th:data-url="@{/demandes/{id}/supprimer(id=${demande.id})}"
-              th:data-name="${demande.lieu}">
-         Supprimer
-      </button>
     </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       AJOUTER UN STATUT
+       ═══════════════════════════════════════════════════ -->
+  <div class="card" style="max-width:860px;">
+    <div class="card-header">
+      <span>➕</span> Ajouter un statut
+    </div>
+    <div class="card-body">
+      <form th:action="@{/demandes/{id}/statut/ajouter(id=${demande.id})}" method="post">
+        <div class="form-grid" style="grid-template-columns: 1fr 2fr auto; align-items:end;">
+
+          <div class="form-group">
+            <label class="form-label" for="statusId">Statut <span class="req">*</span></label>
+            <select id="statusId" name="statusId" class="form-control" required>
+              <option value="">— Choisir —</option>
+              <option th:each="s : ${tousLesStatuts}"
+                      th:value="${s.id}"
+                      th:text="${s.libelle}">—</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="commentaire">Commentaire</label>
+            <input type="text" id="commentaire" name="commentaire"
+                   class="form-control"
+                   placeholder="Ex: Forage démarré, équipe sur place..."/>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" style="height:38px;">
+              ✓ Ajouter
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Zone de danger -->
+  <div class="danger-zone">
+    <div>
+      <div class="danger-zone-title">Zone de danger</div>
+      <div class="danger-zone-text">La suppression est définitive et supprimera tout l'historique associé.</div>
+    </div>
+    <button type="button" class="btn btn-danger btn-delete"
+            th:data-url="@{/demandes/{id}/supprimer(id=${demande.id})}"
+            th:data-name="${demande.lieu}">
+      🗑 Supprimer la demande
+    </button>
   </div>
 
 </th:block>

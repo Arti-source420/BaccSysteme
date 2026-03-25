@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS demande_status (
 );
 
 -- Sample data
-INSERT INTO status (libelle) VALUES ('En attente'), ('En cours'), ('Terminée'), ('Annulée');
+INSERT INTO status (libelle) VALUES ('cree'), ('En cours'), ('Terminée'), ('Annulée');
 INSERT INTO types_devis (libelle) VALUES ('Forage manuel'), ('Forage motorisé'), ('Forage profond');
 
 -- ══════════════════════════════════════════
