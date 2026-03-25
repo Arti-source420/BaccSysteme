@@ -691,3 +691,148 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 1.1rem 0; }
 @media (max-width: 480px) {
     .stats-row { grid-template-columns: 1fr; }
 }
+/* ═══════════════════════════════════════════════════
+   STATUS BADGES — couleurs selon libellé
+   ═══════════════════════════════════════════════════ */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: .3em .85em;
+    border-radius: var(--radius-pill);
+    font-size: .75rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    background: #edf0f4;
+    color: var(--text-muted);
+}
+
+/* Mappings couleur automatiques via data-libelle */
+.status-badge[data-libelle="En attente"],
+.status-badge[data-libelle="en attente"] {
+    background: #fff3e0; color: #b35a00; border-color: rgba(179,90,0,.2);
+}
+.status-badge[data-libelle="En cours"],
+.status-badge[data-libelle="en cours"] {
+    background: var(--info-light); color: #0a5c7a; border-color: rgba(39,188,253,.25);
+}
+.status-badge[data-libelle="Terminée"],
+.status-badge[data-libelle="terminée"],
+.status-badge[data-libelle="Terminé"],
+.status-badge[data-libelle="terminé"] {
+    background: var(--success-light); color: var(--success-dark); border-color: rgba(0,210,122,.25);
+}
+.status-badge[data-libelle="Annulée"],
+.status-badge[data-libelle="annulée"],
+.status-badge[data-libelle="Annulé"],
+.status-badge[data-libelle="annulé"] {
+    background: var(--danger-light); color: var(--danger-dark); border-color: rgba(230,55,87,.2);
+}
+
+/* ═══════════════════════════════════════════════════
+   TIMELINE
+   ═══════════════════════════════════════════════════ */
+.timeline-wrapper {
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+}
+
+.timeline-item:last-child { border-bottom: none; }
+
+/* Trait vertical reliant les points */
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 30px;
+    bottom: -10px;
+    width: 2px;
+    background: var(--border);
+}
+
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+    border: 2px solid var(--border-dark);
+    background: var(--white);
+    position: relative;
+    z-index: 1;
+}
+
+/* Couleur du point selon le statut */
+.timeline-dot[data-libelle="En attente"]  { border-color: #b35a00; background: #fff3e0; }
+.timeline-dot[data-libelle="En cours"]    { border-color: #27bcfd; background: var(--info-light); }
+.timeline-dot[data-libelle="Terminée"],
+.timeline-dot[data-libelle="Terminé"]     { border-color: var(--success); background: var(--success-light); }
+.timeline-dot[data-libelle="Annulée"],
+.timeline-dot[data-libelle="Annulé"]      { border-color: var(--danger); background: var(--danger-light); }
+
+/* Premier item = actuel, point plus grand */
+.timeline-item--first .timeline-dot {
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+}
+
+.timeline-content { flex: 1; min-width: 0; }
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.timeline-date {
+    font-size: .78rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.timeline-comment {
+    font-size: .875rem;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .45rem .75rem;
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+.timeline-comment--empty {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* ─ Danger zone ─ */
+.danger-zone {
+    background: var(--danger-light);
+    border: 1px solid rgba(230,55,87,.22);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+    max-width: 860px;
+}
+
+.danger-zone-title { font-weight: 700; color: var(--danger-dark); font-size: .9rem; margin-bottom: 2px; }
+.danger-zone-text  { font-size: .82rem; color: var(--text-muted); }

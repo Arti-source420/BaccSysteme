@@ -4,6 +4,8 @@ import com.forage.model.Client;
 import com.forage.model.Demande;
 import com.forage.service.ClientService;
 import com.forage.service.DemandeService;
+import com.forage.service.DemandeStatusService;
+import com.forage.repository.StatusRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,7 +24,10 @@ public class DemandeController {
 
     private final DemandeService demandeService;
     private final ClientService clientService;
+    private final DemandeStatusService demandeStatusService;
+    private final StatusRepository statusRepository;
 
+    /* ── Liste ── */
     @GetMapping
     public String list(@RequestParam(required = false) String search, Model model) {
         List<Demande> demandes;
@@ -33,10 +38,10 @@ public class DemandeController {
             demandes = demandeService.findAll();
         }
         model.addAttribute("demandes", demandes);
-        model.addAttribute("totalDemandes", demandeService.findAll().size());
         return "demandes/list";
     }
 
+    /* ── Formulaire création ── */
     @GetMapping("/nouvelle")
     public String createForm(Model model) {
         Demande demande = new Demande();
@@ -65,11 +70,12 @@ public class DemandeController {
             return "demandes/form";
         }
         demande.setClient(client);
-        demandeService.save(demande);
+        demandeService.save(demande); // crée aussi le statut initial "En attente"
         redirectAttributes.addFlashAttribute("successMessage", "Demande créée avec succès !");
         return "redirect:/demandes";
     }
 
+    /* ── Formulaire modification ── */
     @GetMapping("/{id}/modifier")
     public String editForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return demandeService.findById(id)
@@ -110,11 +116,14 @@ public class DemandeController {
         return "redirect:/demandes";
     }
 
+    /* ── Détail + historique des statuts ── */
     @GetMapping("/{id}/detail")
     public String detail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return demandeService.findById(id)
                 .map(demande -> {
                     model.addAttribute("demande", demande);
+                    model.addAttribute("historique", demandeStatusService.findByDemandeId(id));
+                    model.addAttribute("tousLesStatuts", statusRepository.findAll());
                     return "demandes/detail";
                 })
                 .orElseGet(() -> {
@@ -123,6 +132,32 @@ public class DemandeController {
                 });
     }
 
+    /* ── Ajouter un statut depuis la page detail ── */
+    @PostMapping("/{id}/statut/ajouter")
+    public String ajouterStatut(@PathVariable Long id,
+                                @RequestParam Long statusId,
+                                @RequestParam(required = false) String commentaire,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            demandeStatusService.ajouterStatus(id, statusId, commentaire);
+            redirectAttributes.addFlashAttribute("successMessage", "Statut ajouté avec succès !");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Erreur : " + e.getMessage());
+        }
+        return "redirect:/demandes/" + id + "/detail";
+    }
+
+    /* ── Supprimer une entrée de suivi ── */
+    @PostMapping("/{demandeId}/statut/{statutId}/supprimer")
+    public String supprimerStatut(@PathVariable Long demandeId,
+                                  @PathVariable Long statutId,
+                                  RedirectAttributes redirectAttributes) {
+        demandeStatusService.deleteById(statutId);
+        redirectAttributes.addFlashAttribute("successMessage", "Entrée supprimée.");
+        return "redirect:/demandes/" + demandeId + "/detail";
+    }
+
+    /* ── Suppression demande ── */
     @PostMapping("/{id}/supprimer")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         if (demandeService.existsById(id)) {

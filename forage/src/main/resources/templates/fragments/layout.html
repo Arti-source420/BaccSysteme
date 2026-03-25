@@ -6,45 +6,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title th:text="${title} + ' — Forage App'">Forage App</title>
   <link rel="stylesheet" th:href="@{/css/style.css}"/>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>"/>
 </head>
 <body>
 
-<div class="layout">
+<div class="app-layout">
 
- 
-  <div class="main-content">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" th:href="@{/}">
+      <div class="sidebar-brand-icon">⛏️</div>
+      <div>
+        <span class="sidebar-brand-name">Forage App</span>
+        <span class="sidebar-brand-sub">Gestion</span>
+      </div>
+    </a>
+    <nav class="sidebar-nav">
+      <span class="sidebar-label">Navigation</span>
+      <a th:href="@{/}" class="sidebar-link"
+         th:classappend="${activeMenu == 'home'} ? ' active' : ''">
+        <span class="sidebar-link-icon">🏠</span> Tableau de bord
+      </a>
+      <span class="sidebar-label">Gestion</span>
+      <a th:href="@{/clients}" class="sidebar-link"
+         th:classappend="${activeMenu == 'clients'} ? ' active' : ''">
+        <span class="sidebar-link-icon">👥</span> Clients
+      </a>
+      <a th:href="@{/demandes}" class="sidebar-link"
+         th:classappend="${activeMenu == 'demandes'} ? ' active' : ''">
+        <span class="sidebar-link-icon">📋</span> Demandes
+      </a>
+    </nav>
+    <div class="sidebar-footer">© 2024 Forage App</div>
+  </aside>
 
-    <!-- TOPBAR -->
+  <!-- MAIN -->
+  <div class="main-wrapper">
     <header class="topbar">
       <span class="topbar-title" th:text="${title}">Page</span>
-      <div class="topbar-actions">
-        <div class="topbar-badge">
-          <span></span>
-          <span>Forage Management</span>
-        </div>
+      <div class="topbar-chip">
+        <span>⛏️</span>
+        <span>Forage Management</span>
       </div>
     </header>
-
-  
     <main class="page-content">
       <th:block th:replace="${content}"/>
     </main>
   </div>
-
 </div>
 
-<!-- Confirm Delete Modal -->
+<!-- Modal suppression -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-box">
-    <div class="modal-icon">⚠️</div>
+    <span class="modal-icon">⚠️</span>
     <h3 class="modal-title">Confirmer la suppression</h3>
-    <p class="modal-text" id="deleteModalText">Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.</p>
+    <p class="modal-text" id="deleteModalText">Êtes-vous sûr de vouloir supprimer cet élément ?</p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
       <form id="deleteForm" method="post">
-        <input type="hidden" name="_method" value="delete"/>
-        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <button type="submit" class="btn btn-danger">🗑 Supprimer</button>
       </form>
     </div>
   </div>
