@@ -33,7 +33,8 @@ public class Demande {
     @Column(nullable = false, length = 255)
     private String district;
 
-    @NotNull(message = "Le client est obligatoire")
+    // Pas de @NotNull ici : le client est reçu via @RequestParam clientId
+    // et injecté manuellement dans le controller APRÈS la validation Bean
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;

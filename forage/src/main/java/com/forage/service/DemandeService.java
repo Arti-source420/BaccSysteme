@@ -11,6 +11,13 @@ public interface DemandeService {
 
     Optional<Demande> findById(Long id);
 
+    /** Création : persiste la demande ET ajoute le statut initial "En attente" */
+    Demande creer(Demande demande);
+
+    /** Modification : met à jour uniquement les champs de la demande, sans toucher aux statuts */
+    Demande modifier(Long id, Demande demande);
+
+    /** Garde la compatibilité avec l'existant (utilisé en interne) */
     Demande save(Demande demande);
 
     void deleteById(Long id);
