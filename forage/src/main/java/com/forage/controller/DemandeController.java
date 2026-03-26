@@ -2,10 +2,10 @@ package com.forage.controller;
 
 import com.forage.model.Client;
 import com.forage.model.Demande;
+import com.forage.repository.StatusRepository;
 import com.forage.service.ClientService;
 import com.forage.service.DemandeService;
 import com.forage.service.DemandeStatusService;
-import com.forage.repository.StatusRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,26 +22,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DemandeController {
 
-    private final DemandeService demandeService;
-    private final ClientService clientService;
+    private final DemandeService       demandeService;
+    private final ClientService        clientService;
     private final DemandeStatusService demandeStatusService;
-    private final StatusRepository statusRepository;
+    private final StatusRepository     statusRepository;
 
-    /* ── Liste ── */
+    /* ── Liste ───────────────────────────────────────── */
     @GetMapping
     public String list(@RequestParam(required = false) String search, Model model) {
-        List<Demande> demandes;
-        if (search != null && !search.isBlank()) {
-            demandes = demandeService.search(search);
-            model.addAttribute("search", search);
-        } else {
-            demandes = demandeService.findAll();
-        }
+        List<Demande> demandes = (search != null && !search.isBlank())
+                ? demandeService.search(search)
+                : demandeService.findAll();
         model.addAttribute("demandes", demandes);
+        if (search != null) model.addAttribute("search", search);
         return "demandes/list";
     }
 
-    /* ── Formulaire création ── */
+    /* ── Formulaire création ─────────────────────────── */
     @GetMapping("/nouvelle")
     public String createForm(Model model) {
         Demande demande = new Demande();
@@ -53,31 +50,42 @@ public class DemandeController {
     }
 
     @PostMapping("/nouvelle")
-    public String create(@Valid @ModelAttribute Demande demande,
+    public String create(@Valid @ModelAttribute("demande") Demande demande,
                          BindingResult result,
-                         @RequestParam Long clientId,
+                         @RequestParam(value = "clientId", required = false) Long clientId,
                          Model model,
                          RedirectAttributes redirectAttributes) {
+
+        // Validation manuelle du client (non couvert par Bean Validation)
+        if (clientId == null) {
+            result.rejectValue("client", "required", "Le client est obligatoire");
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("clients", clientService.findAll());
             model.addAttribute("pageTitle", "Nouvelle Demande");
             return "demandes/form";
         }
+
         Client client = clientService.findById(clientId).orElse(null);
         if (client == null) {
             model.addAttribute("clients", clientService.findAll());
-            model.addAttribute("errorMessage", "Client invalide.");
+            model.addAttribute("pageTitle", "Nouvelle Demande");
+            model.addAttribute("errorMessage", "Client sélectionné invalide.");
             return "demandes/form";
         }
+
         demande.setClient(client);
-        demandeService.save(demande); // crée aussi le statut initial "En attente"
+        demandeService.save(demande); // isNew=true → crée aussi le statut initial
+
         redirectAttributes.addFlashAttribute("successMessage", "Demande créée avec succès !");
         return "redirect:/demandes";
     }
 
-    /* ── Formulaire modification ── */
+    /* ── Formulaire modification ─────────────────────── */
     @GetMapping("/{id}/modifier")
-    public String editForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editForm(@PathVariable Long id, Model model,
+                           RedirectAttributes redirectAttributes) {
         return demandeService.findById(id)
                 .map(demande -> {
                     model.addAttribute("demande", demande);
@@ -93,32 +101,44 @@ public class DemandeController {
 
     @PostMapping("/{id}/modifier")
     public String update(@PathVariable Long id,
-                         @Valid @ModelAttribute Demande demande,
+                         @Valid @ModelAttribute("demande") Demande demande,
                          BindingResult result,
-                         @RequestParam Long clientId,
+                         @RequestParam(value = "clientId", required = false) Long clientId,
                          Model model,
                          RedirectAttributes redirectAttributes) {
+
+        if (clientId == null) {
+            result.rejectValue("client", "required", "Le client est obligatoire");
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("clients", clientService.findAll());
             model.addAttribute("pageTitle", "Modifier Demande");
             return "demandes/form";
         }
+
         Client client = clientService.findById(clientId).orElse(null);
         if (client == null) {
             model.addAttribute("clients", clientService.findAll());
-            model.addAttribute("errorMessage", "Client invalide.");
+            model.addAttribute("pageTitle", "Modifier Demande");
+            model.addAttribute("errorMessage", "Client sélectionné invalide.");
             return "demandes/form";
         }
+
+        // Charger l'existant, mettre à jour les champs, sauvegarder
+        // → isNew=false car id != null, pas de doublon de statut
         demande.setId(id);
         demande.setClient(client);
         demandeService.save(demande);
+
         redirectAttributes.addFlashAttribute("successMessage", "Demande modifiée avec succès !");
         return "redirect:/demandes";
     }
 
-    /* ── Détail + historique des statuts ── */
+    /* ── Détail + historique ─────────────────────────── */
     @GetMapping("/{id}/detail")
-    public String detail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String detail(@PathVariable Long id, Model model,
+                         RedirectAttributes redirectAttributes) {
         return demandeService.findById(id)
                 .map(demande -> {
                     model.addAttribute("demande", demande);
@@ -132,7 +152,7 @@ public class DemandeController {
                 });
     }
 
-    /* ── Ajouter un statut depuis la page detail ── */
+    /* ── Ajouter un statut ───────────────────────────── */
     @PostMapping("/{id}/statut/ajouter")
     public String ajouterStatut(@PathVariable Long id,
                                 @RequestParam Long statusId,
@@ -147,7 +167,7 @@ public class DemandeController {
         return "redirect:/demandes/" + id + "/detail";
     }
 
-    /* ── Supprimer une entrée de suivi ── */
+    /* ── Supprimer une entrée de suivi ───────────────── */
     @PostMapping("/{demandeId}/statut/{statutId}/supprimer")
     public String supprimerStatut(@PathVariable Long demandeId,
                                   @PathVariable Long statutId,
@@ -157,7 +177,7 @@ public class DemandeController {
         return "redirect:/demandes/" + demandeId + "/detail";
     }
 
-    /* ── Suppression demande ── */
+    /* ── Suppression demande ─────────────────────────── */
     @PostMapping("/{id}/supprimer")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         if (demandeService.existsById(id)) {
