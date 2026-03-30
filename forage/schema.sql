@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS demandes (
     CONSTRAINT fk_demande_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 );
 
--- montant_total supprimé : le total est recalculé dynamiquement depuis les lignes
+
 CREATE TABLE IF NOT EXISTS devis (
     id            BIGSERIAL PRIMARY KEY,
     date          DATE   NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS devis (
     CONSTRAINT fk_devis_demande FOREIGN KEY (demande_id)    REFERENCES demandes(id) ON DELETE SET NULL
 );
 
--- montant → prix_unitaire ; ajout de quantite et date par ligne
+
 CREATE TABLE IF NOT EXISTS details_devis (
     id            BIGSERIAL      PRIMARY KEY,
     libelle       VARCHAR(255)   NOT NULL,
