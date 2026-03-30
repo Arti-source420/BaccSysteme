@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Liste des Devis', ~{::content}, 'devis')}">
+<body>
+<th:block th:fragment="content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Devis</span>
+      </div>
+      <h1>Liste des Devis</h1>
+    </div>
+    <div style="display:flex; align-items:flex-end;">
+      <a th:href="@{/devis/nouveau}" class="btn btn-primary">Nouveau Devis</a>
+    </div>
+  </div>
+
+  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+  <div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>
+
+  <div class="card">
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--bg-secondary,#f4f6fa); border-bottom:2px solid var(--border,#e2e8f0);">
+            <th style="padding:.65rem 1rem; text-align:left; font-size:.82rem; font-weight:700;">#</th>
+            <th style="padding:.65rem 1rem; text-align:left; font-size:.82rem; font-weight:700;">Date</th>
+            <th style="padding:.65rem 1rem; text-align:left; font-size:.82rem; font-weight:700;">Demande</th>
+            <th style="padding:.65rem 1rem; text-align:left; font-size:.82rem; font-weight:700;">Type</th>
+            <th style="padding:.65rem 1rem; text-align:right; font-size:.82rem; font-weight:700;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(devisList)}">
+            <td colspan="5"
+                style="text-align:center; color:var(--text-muted,#8898aa); padding:2rem;">
+              Aucun devis enregistré.
+            </td>
+          </tr>
+          <tr th:each="d : ${devisList}"
+              style="border-bottom:1px solid var(--border,#e2e8f0);">
+            <td style="padding:.65rem 1rem; color:var(--text-muted,#8898aa);"
+                th:text="${d.id}"></td>
+            <td style="padding:.65rem 1rem;"
+                th:text="${#temporals.format(d.date,'dd/MM/yyyy')}"></td>
+            <td style="padding:.65rem 1rem;">
+              <span th:if="${d.demande != null}"
+                    th:text="${d.demande.client.nom} + ' — ' + ${d.demande.lieu}"></span>
+              <span th:unless="${d.demande != null}"
+                    style="color:var(--text-muted,#8898aa);">—</span>
+            </td>
+            <td style="padding:.65rem 1rem;" th:text="${d.typeDevis.libelle}"></td>
+            <td style="padding:.65rem 1rem; text-align:right; white-space:nowrap;">
+              <a th:href="@{/devis/{id}/detail(id=${d.id})}"
+                 class="btn btn-secondary btn-sm">Voir</a>
+              <a th:href="@{/devis/{id}/modifier(id=${d.id})}"
+                 class="btn btn-secondary btn-sm">Modifier</a>
+              <button type="button" class="btn btn-danger btn-sm"
+                      th:onclick="'ouvrirSuppression(' + ${d.id} + ', \'Devis #' + ${d.id} + '\')'">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function ouvrirSuppression(id, label) {
+      document.getElementById('deleteModalText').textContent =
+        'Supprimer ' + label + ' ? Cette action est irréversible.';
+      document.getElementById('deleteForm').action = '/devis/' + id + '/supprimer';
+      document.getElementById('deleteModal').classList.add('active');
+    }
+  </script>
+
+</th:block>
+</body>
+</html>
