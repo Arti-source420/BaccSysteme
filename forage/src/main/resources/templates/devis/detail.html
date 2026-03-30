@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Détail du Devis', ~{::content}, 'devis')}">
+<body>
+<th:block th:fragment="content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="breadcrumb">
+        <a th:href="@{/}">Accueil</a>
+        <span class="breadcrumb-sep">›</span>
+        <a th:href="@{/devis}">Devis</a>
+        <span class="breadcrumb-sep">›</span>
+        <span th:text="'Devis #' + ${devis.id}">Détail</span>
+      </div>
+      <h1 th:text="'Devis #' + ${devis.id}">Détail</h1>
+    </div>
+    <div style="display:flex; gap:.5rem; align-items:flex-end;">
+      <a th:href="@{/devis/{id}/modifier(id=${devis.id})}"
+         class="btn btn-secondary">Modifier</a>
+      <a th:href="@{/devis}" class="btn btn-secondary">Retour</a>
+    </div>
+  </div>
+
+  <!-- Informations générales -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-header"><h2>Informations générales</h2></div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div>
+          <p class="form-label" style="margin-bottom:.25rem;">Date du devis</p>
+          <p th:text="${#temporals.format(devis.date,'dd/MM/yyyy')}"></p>
+        </div>
+        <div>
+          <p class="form-label" style="margin-bottom:.25rem;">Type</p>
+          <p th:text="${devis.typeDevis.libelle}"></p>
+        </div>
+        <div>
+          <p class="form-label" style="margin-bottom:.25rem;">Demande</p>
+          <p th:if="${devis.demande != null}">
+            <a th:href="@{/demandes/{id}/detail(id=${devis.demande.id})}"
+               th:text="${devis.demande.client.nom} + ' — ' + ${devis.demande.lieu}"></a>
+          </p>
+          <p th:unless="${devis.demande != null}"
+             style="color:var(--text-muted,#8898aa);">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lignes de détail -->
+  <div class="card">
+    <div class="card-header"><h2>Lignes du devis</h2></div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--bg-secondary,#f4f6fa); border-bottom:2px solid var(--border,#e2e8f0);">
+            <th style="padding:.65rem 1rem; text-align:left;   font-size:.82rem; font-weight:700;">Libellé</th>
+            <th style="padding:.65rem 1rem; text-align:right;  font-size:.82rem; font-weight:700; white-space:nowrap;">Prix unitaire (Ar)</th>
+            <th style="padding:.65rem 1rem; text-align:center; font-size:.82rem; font-weight:700;">Qté</th>
+            <th style="padding:.65rem 1rem; text-align:center; font-size:.82rem; font-weight:700;">Date</th>
+            <th style="padding:.65rem 1rem; text-align:right;  font-size:.82rem; font-weight:700; white-space:nowrap;">Sous-total (Ar)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="l : ${devis.details}"
+              style="border-bottom:1px solid var(--border,#e2e8f0);">
+            <td style="padding:.65rem 1rem;" th:text="${l.libelle}"></td>
+            <td style="padding:.65rem 1rem; text-align:right;"
+                th:text="${#numbers.formatDecimal(l.prixUnitaire,1,'COMMA',2,'POINT')}"></td>
+            <td style="padding:.65rem 1rem; text-align:center;"
+                th:text="${l.quantite}"></td>
+            <td style="padding:.65rem 1rem; text-align:center;"
+                th:text="${#temporals.format(l.date,'dd/MM/yyyy')}"></td>
+            <td style="padding:.65rem 1rem; text-align:right; font-weight:600;"
+                th:text="${#numbers.formatDecimal(l.sousTotal,1,'COMMA',2,'POINT')}"></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(devis.details)}">
+            <td colspan="5"
+                style="text-align:center; color:var(--text-muted,#8898aa); padding:1.5rem;">
+              Aucune ligne enregistrée.
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--bg-secondary,#f4f6fa); border-top:2px solid var(--border,#e2e8f0);">
+            <td colspan="4"
+                style="padding:.75rem 1rem; text-align:right; font-weight:700; font-size:.95rem;">
+              Total général
+            </td>
+            <td style="padding:.75rem 1rem; text-align:right; font-weight:800; font-size:1.1rem; white-space:nowrap;"
+                th:text="${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')}">0,00</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+</th:block>
+</body>
+</html>

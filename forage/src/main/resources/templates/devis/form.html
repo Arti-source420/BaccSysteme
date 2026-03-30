@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${pageTitle}, ~{::content}, 'devis')}">
+<body>
+<th:block th:fragment="content">
+
+<!-- ═══════════════════════════ EN-TÊTE ═══════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">
+      <a th:href="@{/}">Accueil</a>
+      <span class="breadcrumb-sep">›</span>
+      <a th:href="@{/devis}">Devis</a>
+      <span class="breadcrumb-sep">›</span>
+      <span th:text="${pageTitle}">Formulaire</span>
+    </div>
+    <h1 th:text="${pageTitle}">Devis</h1>
+  </div>
+</div>
+
+<!-- Message d'erreur global -->
+<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+<form id="devisForm"
+      th:action="${devisForm.id == null} ? @{/devis/nouveau} : @{/devis/{id}/modifier(id=${devisForm.id})}"
+      th:object="${devisForm}"
+      method="post"
+      novalidate>
+
+  <!-- ════════════════════════════════════════════════════════════
+       DIV 1 — DEMANDE
+  ═════════════════════════════════════════════════════════════ -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-header">
+      <h2>Demande associée</h2>
+    </div>
+    <div class="card-body">
+
+      <div class="form-group">
+        <label class="form-label" for="demandeId">
+          Demande <span class="required">*</span>
+        </label>
+        <select id="demandeId"
+                th:field="*{demandeId}"
+                class="form-control"
+                th:classappend="${#fields.hasErrors('demandeId')} ? ' is-invalid' : ''"
+                required>
+          <option value="">— Sélectionnez une demande —</option>
+          <option th:each="dem : ${demandes}"
+                  th:value="${dem.id}"
+                  th:text="${dem.client.nom} + '  |  ' + ${dem.lieu} + ', ' + ${dem.district} + '  (' + ${#temporals.format(dem.date,'dd/MM/yyyy')} + ')'">
+          </option>
+        </select>
+        <span th:if="${#fields.hasErrors('demandeId')}"
+              th:errors="*{demandeId}" class="invalid-feedback"></span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       DIV 2 — DATE ET TYPE DE DEVIS
+  ═════════════════════════════════════════════════════════════ -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-header">
+      <h2>Informations générales</h2>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label" for="date">
+            Date du devis <span class="required">*</span>
+          </label>
+          <input type="date" id="date"
+                 th:field="*{date}"
+                 class="form-control"
+                 th:classappend="${#fields.hasErrors('date')} ? ' is-invalid' : ''"
+                 required/>
+          <span th:if="${#fields.hasErrors('date')}"
+                th:errors="*{date}" class="invalid-feedback"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="typeDevisId">
+            Type de devis <span class="required">*</span>
+          </label>
+          <select id="typeDevisId"
+                  th:field="*{typeDevisId}"
+                  class="form-control"
+                  th:classappend="${#fields.hasErrors('typeDevisId')} ? ' is-invalid' : ''"
+                  required>
+            <option value="">— Sélectionnez un type —</option>
+            <option th:each="t : ${typesDevis}"
+                    th:value="${t.id}"
+                    th:text="${t.libelle}">
+            </option>
+          </select>
+          <span th:if="${#fields.hasErrors('typeDevisId')}"
+                th:errors="*{typeDevisId}" class="invalid-feedback"></span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       DIV 3 — LIGNES DE DÉTAIL (AJAX)
+  ═════════════════════════════════════════════════════════════ -->
+  <div class="card" style="margin-bottom:1.25rem;">
+
+    <div class="card-header"
+         style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem;">
+      <h2 style="margin:0;">Lignes du devis</h2>
+      <button type="button" id="btnAjouterLigne" class="btn btn-secondary btn-sm">
+        Ajouter une ligne
+      </button>
+    </div>
+
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:var(--bg-secondary,#f4f6fa); border-bottom:2px solid var(--border,#e2e8f0);">
+            <th style="padding:.65rem 1rem; text-align:left; font-size:.82rem; font-weight:700; white-space:nowrap;">Libellé</th>
+            <th style="padding:.65rem 1rem; text-align:right; font-size:.82rem; font-weight:700; white-space:nowrap;">Prix unitaire (Ar)</th>
+            <th style="padding:.65rem 1rem; text-align:center; font-size:.82rem; font-weight:700;">Qté</th>
+            <th style="padding:.65rem 1rem; text-align:center; font-size:.82rem; font-weight:700;">Date</th>
+            <th style="padding:.65rem 1rem; text-align:right; font-size:.82rem; font-weight:700; white-space:nowrap;">Sous-total (Ar)</th>
+            <th style="padding:.65rem .5rem; width:42px;"></th>
+          </tr>
+        </thead>
+        <tbody id="lignesBody">
+          <!--/* Lignes pré-remplies (mode édition ou ligne vide initiale) */-->
+          <tr th:each="ligne, s : *{lignes}"
+              class="ligne-detail"
+              th:attr="data-index=${s.index}"
+              style="border-bottom:1px solid var(--border,#e2e8f0);">
+
+            <input type="hidden"
+                   th:name="'lignes[' + ${s.index} + '].id'"
+                   th:value="${ligne.id}"/>
+
+            <td style="padding:.5rem .75rem;">
+              <input type="text" class="form-control"
+                     th:name="'lignes[' + ${s.index} + '].libelle'"
+                     th:value="${ligne.libelle}"
+                     placeholder="Description"
+                     required/>
+            </td>
+            <td style="padding:.5rem .75rem;">
+              <input type="number" class="form-control input-pu"
+                     th:name="'lignes[' + ${s.index} + '].prixUnitaire'"
+                     th:value="${ligne.prixUnitaire}"
+                     min="0.01" step="0.01" placeholder="0.00"
+                     required/>
+            </td>
+            <td style="padding:.5rem .5rem;">
+              <input type="number" class="form-control input-qte"
+                     th:name="'lignes[' + ${s.index} + '].quantite'"
+                     th:value="${ligne.quantite}"
+                     min="1" step="1" placeholder="1"
+                     style="text-align:center;"
+                     required/>
+            </td>
+            <td style="padding:.5rem .75rem;">
+              <input type="date" class="form-control input-date-ligne"
+                     th:name="'lignes[' + ${s.index} + '].date'"
+                     th:value="${ligne.date}"
+                     required/>
+            </td>
+            <td style="padding:.5rem .75rem; text-align:right; white-space:nowrap;">
+              <strong class="cell-sous-total">
+                <span th:if="${ligne.sousTotal != null}"
+                      th:text="${#numbers.formatDecimal(ligne.sousTotal,1,'COMMA',2,'POINT')}">0,00</span>
+                <span th:unless="${ligne.sousTotal != null}">0,00</span>
+              </strong>
+            </td>
+            <td style="padding:.5rem .25rem; text-align:center;">
+              <button type="button" class="btn btn-danger btn-sm btn-supprimer"
+                      title="Supprimer cette ligne">&#x2715;</button>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background:var(--bg-secondary,#f4f6fa); border-top:2px solid var(--border,#e2e8f0);">
+            <td colspan="4"
+                style="padding:.75rem 1rem; text-align:right; font-weight:700; font-size:.95rem;">
+              Total général
+            </td>
+            <td id="cellTotalGeneral"
+                style="padding:.75rem 1rem; text-align:right; font-weight:800; font-size:1.1rem; white-space:nowrap;">
+              0,00
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <p id="msgAucuneLigne"
+         style="text-align:center; color:var(--text-muted,#8898aa); padding:1.5rem 1rem; display:none;">
+        Aucune ligne. Cliquez sur "Ajouter une ligne".
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ACTIONS
+  ═════════════════════════════════════════════════════════════ -->
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+      <span th:if="${devisForm.id == null}">Enregistrer le devis</span>
+      <span th:unless="${devisForm.id == null}">Sauvegarder les modifications</span>
+    </button>
+    <a th:href="@{/devis}" class="btn btn-secondary">Annuler</a>
+  </div>
+
+</form>
+
+<!-- ════════════════════════════════════════════════════════════════
+     TEMPLATE HTML D'UNE NOUVELLE LIGNE (cloné par JS)
+═══════════════════════════════════════════════════════════════════ -->
+<template id="tplLigne">
+  <tr class="ligne-detail" data-index=""
+      style="border-bottom:1px solid var(--border,#e2e8f0);">
+    <input type="hidden" name="" value=""/>
+    <td style="padding:.5rem .75rem;">
+      <input type="text" class="form-control"
+             name="" placeholder="Description" required/>
+    </td>
+    <td style="padding:.5rem .75rem;">
+      <input type="number" class="form-control input-pu"
+             name="" min="0.01" step="0.01" placeholder="0.00" required/>
+    </td>
+    <td style="padding:.5rem .5rem;">
+      <input type="number" class="form-control input-qte"
+             name="" min="1" step="1" value="1"
+             style="text-align:center;" required/>
+    </td>
+    <td style="padding:.5rem .75rem;">
+      <input type="date" class="form-control input-date-ligne"
+             name="" required/>
+    </td>
+    <td style="padding:.5rem .75rem; text-align:right; white-space:nowrap;">
+      <strong class="cell-sous-total">0,00</strong>
+    </td>
+    <td style="padding:.5rem .25rem; text-align:center;">
+      <button type="button" class="btn btn-danger btn-sm btn-supprimer"
+              title="Supprimer">&#x2715;</button>
+    </td>
+  </tr>
+</template>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════════════════════════════ -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+(function () {
+  'use strict';
+
+  /* ─── Constantes injectées par Thymeleaf ─── */
+  const TODAY          = /*[[${today}]]*/ '';
+  const URL_SOUS_TOTAL = /*[[@{/devis/ajax/sous-total}]]*/ '/devis/ajax/sous-total';
+  const URL_TOTAL      = /*[[@{/devis/ajax/total}]]*/ '/devis/ajax/total';
+
+  /* ─── Références DOM ─── */
+  const corps      = document.getElementById('lignesBody');
+  const cellTotal  = document.getElementById('cellTotalGeneral');
+  const msgVide    = document.getElementById('msgAucuneLigne');
+  const tpl        = document.getElementById('tplLigne');
+  const btnAjouter = document.getElementById('btnAjouterLigne');
+
+  /* Compteur d'index : initialisé au nombre de lignes déjà dans le DOM */
+  let nextIdx = corps.querySelectorAll('tr.ligne-detail').length;
+
+  /* ─── Formatage : 1 234 567,89 ─── */
+  function fmt(v) {
+    const n = parseFloat(v);
+    if (isNaN(n)) return '0,00';
+    return n.toLocaleString('fr-MG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /* ─── Recalcul sous-total d'une ligne (AJAX) ─── */
+  async function recalcSousTotal(tr) {
+    const pu   = parseFloat(tr.querySelector('.input-pu').value);
+    const qte  = parseInt(tr.querySelector('.input-qte').value, 10);
+    const cell = tr.querySelector('.cell-sous-total');
+
+    if (!pu || !qte || pu <= 0 || qte <= 0) {
+      cell.textContent = '0,00';
+      await recalcTotal();
+      return;
+    }
+
+    try {
+      const r    = await fetch(`${URL_SOUS_TOTAL}?prixUnitaire=${pu}&quantite=${qte}`, { method: 'POST' });
+      const data = await r.json();
+      cell.textContent = fmt(data.sousTotal);
+    } catch (_) {
+      cell.textContent = fmt(pu * qte); /* fallback local */
+    }
+
+    await recalcTotal();
+  }
+
+  /* ─── Recalcul total général (AJAX) ─── */
+  async function recalcTotal() {
+    const payload = [];
+    corps.querySelectorAll('tr.ligne-detail').forEach(tr => {
+      const pu  = tr.querySelector('.input-pu')?.value;
+      const qte = tr.querySelector('.input-qte')?.value;
+      if (pu && qte) payload.push({ prixUnitaire: pu, quantite: qte });
+    });
+
+    if (payload.length === 0) { cellTotal.textContent = '0,00'; return; }
+
+    try {
+      const r    = await fetch(URL_TOTAL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await r.json();
+      cellTotal.textContent = fmt(data.total);
+    } catch (_) {
+      /* fallback local */
+      let sum = 0;
+      payload.forEach(l => { sum += parseFloat(l.prixUnitaire) * parseInt(l.quantite); });
+      cellTotal.textContent = fmt(sum);
+    }
+  }
+
+  /* ─── Synchronisation du message "aucune ligne" ─── */
+  function majVide() {
+    const n = corps.querySelectorAll('tr.ligne-detail').length;
+    msgVide.style.display = n === 0 ? 'block' : 'none';
+  }
+
+  /* ─── Réindexation des name= après suppression ─── */
+  function reindexer() {
+    corps.querySelectorAll('tr.ligne-detail').forEach((tr, i) => {
+      tr.setAttribute('data-index', i);
+      tr.querySelectorAll('[name]').forEach(el => {
+        el.name = el.name.replace(/lignes\[\d+\]/, `lignes[${i}]`);
+      });
+    });
+    nextIdx = corps.querySelectorAll('tr.ligne-detail').length;
+  }
+
+  /* ─── Attacher les écouteurs d'une ligne ─── */
+  function attacher(tr) {
+    tr.querySelector('.input-pu').addEventListener('input',  () => recalcSousTotal(tr));
+    tr.querySelector('.input-qte').addEventListener('input', () => recalcSousTotal(tr));
+    tr.querySelector('.btn-supprimer').addEventListener('click', () => {
+      if (corps.querySelectorAll('tr.ligne-detail').length <= 1) {
+        alert('Le devis doit comporter au moins une ligne.');
+        return;
+      }
+      tr.remove();
+      reindexer();
+      recalcTotal();
+      majVide();
+    });
+  }
+
+  /* ─── Ajouter une nouvelle ligne ─── */
+  btnAjouter.addEventListener('click', () => {
+    const idx      = nextIdx++;
+    const fragment = tpl.content.cloneNode(true);
+    const tr       = fragment.querySelector('tr');
+
+    tr.setAttribute('data-index', idx);
+
+    /* Nommer tous les champs */
+    const inputs = tr.querySelectorAll('input');
+    /* inputs[0]=hidden id, [1]=libelle, [2]=prixUnitaire, [3]=quantite, [4]=date */
+    inputs[0].name = `lignes[${idx}].id`;
+    inputs[1].name = `lignes[${idx}].libelle`;
+    inputs[2].name = `lignes[${idx}].prixUnitaire`;
+    inputs[3].name = `lignes[${idx}].quantite`;
+    inputs[4].name = `lignes[${idx}].date`;
+    inputs[4].value = TODAY;
+
+    corps.appendChild(tr);
+
+    /* Récupérer la TR depuis le DOM pour attacher les écouteurs */
+    const nouvelle = corps.querySelector(`tr.ligne-detail[data-index="${idx}"]`);
+    attacher(nouvelle);
+    majVide();
+    nouvelle.querySelector('input[type="text"]').focus();
+  });
+
+  /* ─── Init : attacher les lignes déjà présentes + calcul initial ─── */
+  corps.querySelectorAll('tr.ligne-detail').forEach(attacher);
+  recalcTotal().then(majVide);
+
+  /* ─── Validation JS avant envoi ─── */
+  document.getElementById('devisForm').addEventListener('submit', e => {
+    const lignes = corps.querySelectorAll('tr.ligne-detail');
+    if (lignes.length === 0) {
+      e.preventDefault();
+      alert('Ajoutez au moins une ligne avant de sauvegarder.');
+      return;
+    }
+    let ok = true;
+    lignes.forEach(tr => {
+      const libelle = tr.querySelector('input[type="text"]').value.trim();
+      const pu      = tr.querySelector('.input-pu').value;
+      const qte     = tr.querySelector('.input-qte').value;
+      const date    = tr.querySelector('.input-date-ligne').value;
+      if (!libelle || !pu || !qte || !date) ok = false;
+    });
+    if (!ok) {
+      e.preventDefault();
+      alert('Veuillez remplir tous les champs de chaque ligne.');
+    }
+  });
+
+})();
+/*]]>*/
+</script>
+
+</th:block>
+</body>
+</html>
